@@ -1,0 +1,36 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+corsPaths: "/**"
+####### resource server configuration properties
+spring:
+  security:
+    basic:
+      enabled: false
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8083/auth/realms/baeldung
+          jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
+  datasource:
+    #url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testDb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: lem
+    password: lem
+    hikari:
+      minimumIdle: 5
+      maximumPoolSize: 20
+      idleTimeout: 30000
+      maxLifetime: 2000000
+      connectionTimeout: 30000
+      poolName: HikariPoolBooks
+
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    hibernate:
+      use-new-id-generator-mappings: false
+      ddl-auto: create

@@ -1,0 +1,41 @@
+server: 
+  port: ${PORT}
+  servlet: 
+    context-path: /api
+  ssl:
+    key-store: ${KEY_STORE}
+    key-store-type: {$KEY_STORE_TYPE}
+    key-store-password: ${KEY_STORE_PW}
+    key-password: ${KEY_PW}
+    key-alias: ${KEY_ALIAS}
+corsPaths: ${CORS_PATHS}
+####### resource server configuration properties
+spring:
+  security:
+    basic:
+      enabled: false
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI}
+          jwk-set-uri: ${JWK_SET_URI}
+  datasource:
+    #url: jdbc:h2:mem:testdb
+    url: ${JDBC_URL}
+    username: ${JDBC_UN}
+    password: ${JDBC_PW}
+    hikari:
+      minimumIdle: 5
+      maximumPoolSize: 20
+      idleTimeout: 30000
+      maxLifetime: 2000000
+      connectionTimeout: 30000
+      poolName: HikariPoolBooks
+
+  jpa:
+    database: oracle
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+    generate-ddl: true
+    hibernate:
+      use-new-id-generator-mappings: false
+      ddl-auto: validate
