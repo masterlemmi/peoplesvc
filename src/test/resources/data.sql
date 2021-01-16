@@ -222,6 +222,7 @@ insert into link  (name, url, person_id) values ('Facebook', 'http://www.faceboo
 insert into link  (name, url, person_id) values ('Youtube', 'http://www.faaaacebook.com', 3);
 insert into link  (name, url, person_id) values ('Facebook', 'http://www.facebook.com', 3);
 
+
 Insert into RELATIONSHIP_LABEL (ID,LABEL,OPPOSITE_LABEL,RELATIONSHIP_ID) values (1,'wife','husband',1);
-Insert into RELATIONSHIP_LABEL (ID,LABEL,OPPOSITE_LABEL,RELATIONSHIP_ID) values (2,'bestfriend','bestfriend',2);
+Insert into RELATIONSHIP_LABEL (ID,LABEL,OPPOSITE_LABEL,RELATIONSHIP_ID) values (2,'bestfriend','bestfriends',2);
 Insert into RELATIONSHIP_LABEL (ID,LABEL,OPPOSITE_LABEL,RELATIONSHIP_ID) values (3,'bff','bff',1);

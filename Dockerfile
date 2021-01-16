@@ -24,6 +24,8 @@ RUN mvn -T 1C install -Dspring-boot.repackage.skip=true && rm -rf target
 # copy other source files (keep in image)
 COPY src /usr/src/app/src
 
+
+
 RUN cd /usr/src/app && /usr/bin/mvn clean package
 
 RUN echo "done!"
@@ -31,6 +33,10 @@ RUN echo "done!"
 
 FROM openjdk:11-jre-slim
 WORKDIR /spring
+
+COPY ./tls.crt .
+
+RUN  keytool -import -noprompt -trustcacerts -alias "lemtools" -file /spring/tls.crt -keystore /usr/local/openjdk-11/lib/security/cacerts -storepass changeit
 
 COPY --from=builder /usr/src/app/target/*.jar ./app.jar
 
