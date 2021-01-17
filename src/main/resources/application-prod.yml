@@ -20,7 +20,6 @@ spring:
           issuer-uri: ${ISSUER_URI}
           jwk-set-uri: ${JWK_SET_URI}
   datasource:
-    #url: jdbc:h2:mem:testdb
     url: ${JDBC_URL}
     username: ${JDBC_UN}
     password: ${JDBC_PW}
