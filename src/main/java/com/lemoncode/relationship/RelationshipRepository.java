@@ -1,8 +1,6 @@
 package com.lemoncode.relationship;
 
 
-import com.lemoncode.person.Person;
-import com.lemoncode.person.Person_;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -17,13 +15,13 @@ public class RelationshipRepository {
     @PersistenceContext
     EntityManager entityManager;
 
-    public List<Relationship> findAll() {
+    public List<Relations> findAll() {
         this.entityManager.clear();
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         // create query
-        CriteriaQuery<Relationship> q = cb.createQuery(Relationship.class);
+        CriteriaQuery<Relations> q = cb.createQuery(Relations.class);
         // set the root class
-        Root<Relationship> root = q.from(Relationship.class);
+        Root<Relations> root = q.from(Relations.class);
         //perform query
 //        q.orderBy(cb.desc(root.get(Relationship_.hasUpdate)), cb.asc(root.get(Relationship_.title)));
 
@@ -33,7 +31,7 @@ public class RelationshipRepository {
 
 
     @Transactional
-    public Relationship save(Relationship rel) {
+    public Relations save(Relations rel) {
         if (rel.getId() == null) {
             this.entityManager.persist(rel);
             return rel;
@@ -42,45 +40,45 @@ public class RelationshipRepository {
         }
     }
 
-    @Transactional
-    public int deleteById(long id) {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        // create delete
-        CriteriaDelete<Relationship> delete = cb.createCriteriaDelete(Relationship.class);
-        // set the root class
-        Root<Relationship> root = delete.from(Relationship.class);
-        // set where clause
-        delete.where(cb.equal(root.get(Relationship_.id), id));
-        // perform update
-        return this.entityManager.createQuery(delete).executeUpdate();
-    }
+//    @Transactional
+//    public int deleteById(long id) {
+//        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+//        // create delete
+//        CriteriaDelete<Relations> delete = cb.createCriteriaDelete(Relations.class);
+//        // set the root class
+//        Root<Relations> root = delete.from(Relations.class);
+//        // set where clause
+//        delete.where(cb.equal(root.get(Relationship_.id), id));
+//        // perform update
+//        return this.entityManager.createQuery(delete).executeUpdate();
+//    }
 
 
-    public List<Relationship> findByPersonId(int id) {
-        try {
-            this.entityManager.clear();
-            CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-            // create query
-            CriteriaQuery<Relationship> query = cb.createQuery(Relationship.class);
-            // set the root class
-            Root<Relationship> supplierRoot = query.from(Relationship.class);
-
-            Join<Relationship, Person> person1 = supplierRoot.join(Relationship_.person1);
-            Join<Relationship, Person> person2 = supplierRoot.join(Relationship_.person2);
-            query
-                    .select(supplierRoot)
-                    .where(
-                            cb.or(
-                                    cb.equal(person1.get(Person_.id), id),
-                                    cb.equal(person2.get(Person_.id), id)
-                            )
-                    );
-
-            //perform query
-            return this.entityManager.createQuery(query).getResultList();
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
+//    public List<Relations> findByPersonId(int id) {
+//        try {
+//            this.entityManager.clear();
+//            CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+//            // create query
+//            CriteriaQuery<Relations> query = cb.createQuery(Relations.class);
+//            // set the root class
+//            Root<Relations> supplierRoot = query.from(Relations.class);
+//
+//            Join<Relations, Person> person1 = supplierRoot.join(Relationship_.person1);
+//            Join<Relations, Person> person2 = supplierRoot.join(Relationship_.person2);
+//            query
+//                    .select(supplierRoot)
+//                    .where(
+//                            cb.or(
+//                                    cb.equal(person1.get(Person_.id), id),
+//                                    cb.equal(person2.get(Person_.id), id)
+//                            )
+//                    );
+//
+//            //perform query
+//            return this.entityManager.createQuery(query).getResultList();
+//
+//        } catch (Exception e) {
+//            return null;
+//        }
+//    }
 }

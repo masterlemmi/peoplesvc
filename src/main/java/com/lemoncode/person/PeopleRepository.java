@@ -3,6 +3,7 @@ package com.lemoncode.person;
 
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -136,18 +137,26 @@ public class PeopleRepository {
     }
 
 
-    public Person findById(int id) {
+    public Person findById(long id) {
         try {
             this.entityManager.clear();
+
             CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
             // create query
             CriteriaQuery<Person> query = cb.createQuery(Person.class);
             // set the root class
+
+            EntityGraph<Person> entityGraph = entityManager.createEntityGraph(Person.class);
+            entityGraph.addAttributeNodes("children");
+            entityGraph.addAttributeNodes("relationships");
+
+
             Root<Person> root = query.from(Person.class);
 
             query.where(cb.equal(root.get(Person_.id), id));
             //perform query
-            return this.entityManager.createQuery(query).getSingleResult();
+            return this.entityManager.createQuery(query).setHint("javax.persistence.fetchgraph", entityGraph)
+.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -177,4 +186,5 @@ public class PeopleRepository {
             return new ArrayList<>();
         }
     }
+
 }

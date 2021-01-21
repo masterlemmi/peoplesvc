@@ -1,6 +1,7 @@
 package com.lemoncode.person;
 
-import com.lemoncode.relationship.RelationshipDTO;
+import com.lemoncode.relationship.Relations;
+import com.lemoncode.relationship.RelationshipRepository;
 import com.lemoncode.relationship.RelationshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,12 @@ public class PeopleResource {
     @PostMapping("/simple")
     public SimplePersonDTO createSimplePerson(@RequestBody SimplePersonDTO p) {
         return peopleService.createSimplePerson(p);
+    }
+
+    @PostMapping()
+    public PersonDTO createPerson(@RequestBody PersonDTO p) {
+        return peopleService.createPerson(p);
+
     }
 
 
@@ -67,12 +74,12 @@ public class PeopleResource {
         return peopleService.findOne(id);
     }
 
-    @GetMapping("/{id}/relations")
-    public List<RelationshipDTO> findPeopleWithRelationshipsAs(@PathVariable("id") int id, @RequestParam(value = "label", required = false) String label) {
-        if (label == null) {
-            return relService.getRelationships(id);
-        }
-        return List.of(relService.getRelationships(id, label));
-    }
+//    @GetMapping("/{id}/relations")
+//    public List<RelationshipDTO> findPeopleWithRelationshipsAs(@PathVariable("id") int id, @RequestParam(value = "label", required = false) String label) {
+//        if (label == null) {
+//            return relService.getRelationships(id);
+//        }
+//        return List.of(relService.getRelationships(id, label));
+//    }
 
 }

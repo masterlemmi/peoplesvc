@@ -1,6 +1,7 @@
 package com.lemoncode.person;
 
 
+import com.lemoncode.relationship.Relations;
 import com.lemoncode.relationship.RelationshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,6 @@ class PeopleService {
 
         if (dto != null) {
             dto.setParents(getParents(id));
-            dto.setRelationships(relService.getRelationships(id));
             dto.setSiblings(getSiblings(id));
         }
 
@@ -106,4 +106,13 @@ class PeopleService {
         p.setFullName(p.getFirstName() + " " + p.getLastName());
         return p;
     }
+
+    public PersonDTO createPerson(PersonDTO p) {
+        Person person = this.mapper.toPerson(p);
+        Person saved = repository.save(person);
+        p.setId(saved.getId());
+        return p;
+    }
+
+   
 }
