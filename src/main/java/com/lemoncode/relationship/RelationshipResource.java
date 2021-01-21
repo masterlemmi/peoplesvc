@@ -20,17 +20,17 @@ public class RelationshipResource {
     private RelationshipService relService;
 
 
-    @GetMapping
-    public List<RelationshipDTO> getRelationshipsOfPerson(@NonNull @RequestParam("person") Integer personId) {
-        return relService.getRelationships(personId);
-    }
-
-
-    @GetMapping("/{id}")
-    public List<Relationship> getAllByPersonID(@PathParam("id") Integer personId) {
-
-        return relService.getRelationashipsTest(personId);
-    }
+//    @GetMapping
+//    public List<RelationshipDTO> getRelationshipsOfPerson(@NonNull @RequestParam("person") Integer personId) {
+//        return relService.getRelationships(personId);
+//    }
+//
+//
+//    @GetMapping("/{id}")
+//    public List<Relations> getAllByPersonID(@PathParam("id") Integer personId) {
+//
+//        return relService.getRelationashipsTest(personId);
+//    }
 
 
 }

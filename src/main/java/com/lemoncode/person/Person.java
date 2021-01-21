@@ -1,12 +1,11 @@
 package com.lemoncode.person;
 
+import com.lemoncode.relationship.Relations;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity(name = "PEOPLE")
 @Getter
@@ -46,6 +45,23 @@ public class Person {
             inverseJoinColumns = @JoinColumn(name = "child_id")
     )
     private Set<Person> children = new HashSet<>(); //possibility of multiple parents
+
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "relationships",
+            joinColumns = {@JoinColumn(name = "person_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "relations_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "label")
+    private Map<String, Relations> relationships = new HashMap<>();
+
+    public void addRelationship(String label, Relations rel){
+        this.relationships.put(label, rel);
+    }
+
+    public void removeRelationship(String label){
+        this.relationships.remove(label);
+    }
+
 
     public void addChild(@NonNull Person person) {
         this.children.add(person);

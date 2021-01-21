@@ -1,13 +1,17 @@
 package com.lemoncode.person;
 
 
+import com.lemoncode.relationship.Relations;
+import com.lemoncode.relationship.RelationshipDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = "spring")
@@ -15,7 +19,6 @@ public abstract class PersonMapper {
 
     public static PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
 
-    @Mapping(target = "relationships", ignore = true) //set on personservice
     @Mapping(target = "parents", ignore = true) //set on personservice
     @Mapping(target = "siblings", ignore = true) //set on personservice
     @Mapping(target = "initials", ignore = true)
@@ -29,6 +32,35 @@ public abstract class PersonMapper {
     @Mapping(target = "initials", ignore = true)
 //    @Mapping(target = "relationshipLabel", ignore=true)
     public abstract SimplePersonDTO simplify(Person person);
+
+    public List<RelationshipDTO> toRelationshipDTO(Map<String, Relations> relationsMap){
+        List<RelationshipDTO> list = new ArrayList<>();
+
+        for(Map.Entry<String, Relations> entrySet: relationsMap.entrySet()){
+
+            RelationshipDTO dto = new RelationshipDTO();
+            dto.setLabel(entrySet.getKey());
+            Set<SimplePersonDTO> people = entrySet.getValue().getPeople().stream().map(this::simplify).collect(toSet());
+            dto.setPeople(people);
+            list.add(dto);
+        }
+        return list;
+    }
+
+
+    public Map<String, Relations>  toRelationship(List<RelationshipDTO> list){
+        Map<String, Relations> map = new HashMap<>();
+
+        for (RelationshipDTO dto: list){
+            Set<SimplePersonDTO> people = dto.getPeople();
+            Set<Person> personSet = dto.getPeople().stream().map(this::toPerson).collect(toSet());
+            map.put(dto.getLabel(), new Relations(personSet));
+        }
+
+        return map;
+
+
+    }
 
     @AfterMapping
     void after(@MappingTarget SimplePersonDTO simp) {
@@ -69,5 +101,23 @@ public abstract class PersonMapper {
     @Mapping(target = "fullName", expression = "java(person.getFirstName() + \" \" + person.getLastName() )")
     public abstract CacheNameDTO namesOnly(Person person);
 
+
+    @Mapping(target = "gender", expression = "java(GenderEnum.from(p.getGender()))")
+    public abstract Person toPerson(PersonDTO p);
+
+
+    public  Person toPerson(SimplePersonDTO p){
+        Person person = new Person();
+        person.setLastName(p.getLastName());
+        person.setFirstName(p.getFirstName());
+        person.setGender(GenderEnum.from(p.getGender()));
+        person.setNickname(p.getNickname());
+        person.setPhotoUrl(p.getPhotoUrl());
+        person.setId(p.getId());
+        return person;
+    }
+
+    @Mapping(target = "person", ignore = true)
+    public abstract Link toLink(LinkDTO dto);
 
 }

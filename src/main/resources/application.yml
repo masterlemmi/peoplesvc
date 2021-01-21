@@ -15,8 +15,8 @@ spring:
           jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
   datasource:
     url: jdbc:oracle:thin:@localhost:1521/xepdb1
-    username: lem
-    password: lem
+    username: lem_stage
+    password: lem_stage
     hikari:
       minimumIdle: 5
       maximumPoolSize: 20
@@ -32,3 +32,8 @@ spring:
     hibernate:
       use-new-id-generator-mappings: false
       ddl-auto: validate
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: DEBUG
