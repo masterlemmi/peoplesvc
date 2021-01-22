@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -109,6 +110,17 @@ class PeopleService {
 
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
+        Map<String, Relations> rel = person.getRelationships();
+        for(Map.Entry<String, Relations> entrySet: rel.entrySet()){
+            Relations relations = entrySet.getValue();
+
+            Set<Person> newPeopleSet =new HashSet<>();
+            for (Person other: relations.getPeople()){
+                newPeopleSet.add(repository.findById(other.getId()));
+            }
+            relations.setPeople(newPeopleSet);
+        }
+
         Person saved = repository.save(person);
         p.setId(saved.getId());
         return p;
