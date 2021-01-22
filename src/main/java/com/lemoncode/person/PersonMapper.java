@@ -52,7 +52,6 @@ public abstract class PersonMapper {
         Map<String, Relations> map = new HashMap<>();
 
         for (RelationshipDTO dto: list){
-            Set<SimplePersonDTO> people = dto.getPeople();
             Set<Person> personSet = dto.getPeople().stream().map(this::toPerson).collect(toSet());
             map.put(dto.getLabel(), new Relations(personSet));
         }
@@ -84,6 +83,13 @@ public abstract class PersonMapper {
                 .collect(Collectors.joining());
         p.setInitials(initials);
         p.setGender(p.getGender().equals("MALE") ? "M" : "F");
+    }
+
+    @AfterMapping
+    void after(@MappingTarget Person p) {
+        for (Link link: p.getLinks()){
+            link.setPerson(p);
+        }
     }
 
     Integer computeAge(LocalDate dateOfBirth) {
