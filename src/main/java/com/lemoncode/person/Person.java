@@ -26,7 +26,7 @@ public class Person {
     private String lastName;
     private String nickname;
     private String address;
-    private String photoUrl;
+    private String photo;
     private String email;
     private String notes;
     @Enumerated(EnumType.STRING)

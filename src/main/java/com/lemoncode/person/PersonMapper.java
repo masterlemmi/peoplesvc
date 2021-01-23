@@ -22,21 +22,22 @@ public abstract class PersonMapper {
     @Mapping(target = "parents", ignore = true) //set on personservice
     @Mapping(target = "siblings", ignore = true) //set on personservice
     @Mapping(target = "initials", ignore = true)
+    @Mapping(target = "photoUrl", expression = "java(setPhotoUrl(person.getId()))")
     @Mapping(target = "fullName", expression = "java(person.getFirstName() + \" \" + person.getLastName() )")
     @Mapping(target = "age", expression = "java(computeAge(person.getDateOfBirth()))")
     @Mapping(target = "deceased", expression = "java(person.getDateOfDeath() !=  null)")
     @Mapping(target = "notes", expression = "java(replaceNewLines(person.getNotes()))")
-    public abstract PersonDTO personToPersonDTO(Person person);
+    public abstract PersonDTO toPersonDTO(Person person);
 
     @Mapping(target = "fullName", expression = "java(person.getFirstName() + \" \" + person.getLastName() )")
     @Mapping(target = "initials", ignore = true)
-//    @Mapping(target = "relationshipLabel", ignore=true)
+    @Mapping(target = "photoUrl", expression = "java(setPhotoUrl(person.getId()))")
     public abstract SimplePersonDTO simplify(Person person);
 
-    public List<RelationshipDTO> toRelationshipDTO(Map<String, Relations> relationsMap){
+    public List<RelationshipDTO> toRelationshipDTO(Map<String, Relations> relationsMap) {
         List<RelationshipDTO> list = new ArrayList<>();
 
-        for(Map.Entry<String, Relations> entrySet: relationsMap.entrySet()){
+        for (Map.Entry<String, Relations> entrySet : relationsMap.entrySet()) {
 
             RelationshipDTO dto = new RelationshipDTO();
             dto.setLabel(entrySet.getKey());
@@ -47,11 +48,17 @@ public abstract class PersonMapper {
         return list;
     }
 
+    String setPhotoUrl(Long id) {
+        if (id == null)
+            return null;
+        return "api/people/" + id + "/image";
+    }
 
-    public Map<String, Relations>  toRelationship(List<RelationshipDTO> list){
+
+    public Map<String, Relations> toRelationship(List<RelationshipDTO> list) {
         Map<String, Relations> map = new HashMap<>();
 
-        for (RelationshipDTO dto: list){
+        for (RelationshipDTO dto : list) {
             Set<Person> personSet = dto.getPeople().stream().map(this::toPerson).collect(toSet());
             map.put(dto.getLabel(), new Relations(personSet));
         }
@@ -87,14 +94,14 @@ public abstract class PersonMapper {
 
     @AfterMapping
     void after(@MappingTarget Person p) {
-        for (Link link: p.getLinks()){
+        for (Link link : p.getLinks()) {
             link.setPerson(p);
         }
     }
 
     Integer computeAge(LocalDate dateOfBirth) {
         if (dateOfBirth == null) return null;
-        return Period.between(LocalDate.now(), dateOfBirth).getYears();
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
     String replaceNewLines(String notes) {
@@ -109,16 +116,16 @@ public abstract class PersonMapper {
 
 
     @Mapping(target = "gender", expression = "java(GenderEnum.from(p.getGender()))")
+    @Mapping(target = "photo",ignore = true)
     public abstract Person toPerson(PersonDTO p);
 
 
-    public  Person toPerson(SimplePersonDTO p){
+    Person toPerson(SimplePersonDTO p) {
         Person person = new Person();
         person.setLastName(p.getLastName());
         person.setFirstName(p.getFirstName());
         person.setGender(GenderEnum.from(p.getGender()));
         person.setNickname(p.getNickname());
-        person.setPhotoUrl(p.getPhotoUrl());
         person.setId(p.getId());
         return person;
     }

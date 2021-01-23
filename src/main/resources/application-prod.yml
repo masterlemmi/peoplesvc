@@ -9,6 +9,7 @@ server:
     key-password: ${KEY_PW}
     key-alias: ${KEY_ALIAS}
 corsPaths: ${CORS_PATHS}
+imageDir: ${IMAGE_DIR}
 ####### resource server configuration properties
 spring:
   security:
