@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /api
 corsPaths: "/**"
+imageDir: "images"
 ####### resource server configuration properties
 spring:
   security:
