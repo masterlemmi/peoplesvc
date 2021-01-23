@@ -1,18 +1,19 @@
 package com.lemoncode.file;
 
-public class ResponseMessage {
-  private String message;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-  public ResponseMessage(String message) {
-    this.message = message;
-  }
+@Getter
+@Setter
+@NoArgsConstructor
+public class ResponseMessage<T> {
+    private String message;
+    private T data;
 
-  public String getMessage() {
-    return message;
-  }
+    public ResponseMessage(String msg) {
+        this.message = msg;
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
 
 }

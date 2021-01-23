@@ -28,7 +28,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
     DocumentSanitizer sanitizer;
 
     @Override
-    public void save(long id, String name, MultipartFile uploaded) {
+    public void save(String name, MultipartFile uploaded) {
         Path tmpPath = null;
         try {
             File tmpFile = File.createTempFile("uploaded-", null);
@@ -53,13 +53,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 LOG.info("Received temp file SHA256 : {}\n", hashHex);
 
 
-                File dir = new File(imageDir + "/" + id);
-
-                if (!dir.exists()) {
-                    boolean mkdir = dir.mkdirs();
-                    if (!mkdir) throw new RuntimeException("Unable to create directory for saving");
-                }
-
+                File dir = new File(imageDir);
                 File file = new File(dir, name);
                 Files.copy(uploaded.getInputStream(), file.toPath());
             }
@@ -71,10 +65,11 @@ public class FilesStorageServiceImpl implements FilesStorageService {
     }
 
     @Override
-    public Resource load(long id, String filename) {
+    public Resource load(String filename) {
         try {
-            Path root = Paths.get(imageDir + "/" + id);
+            Path root = Paths.get(imageDir );
             Path file = root.resolve(filename);
+            LOG.info("FileName" + file.toFile());
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {

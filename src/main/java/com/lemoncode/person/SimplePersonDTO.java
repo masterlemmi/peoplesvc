@@ -24,6 +24,7 @@ public class SimplePersonDTO {
     @EqualsAndHashCode.Include
     private @NonNull String gender;
     private String fullName;
+    private String photo;
     private String photoUrl;
     private String initials;
 

@@ -38,12 +38,12 @@ class PeopleService {
     FilesStorageService storageService;
 
     List<SimplePersonDTO> findAll() {
-        return repository.findAll().stream().map(this.mapper::simplify).collect(Collectors.toList());
+        return repository.findAll().stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
     }
 
     List<SimplePersonDTO> findAll(Set<Long> excludeIds) {
         return repository.findAll()
-                .stream().filter(p -> !excludeIds.contains(p.getId())).map(mapper::simplify).collect(toList());
+                .stream().filter(p -> !excludeIds.contains(p.getId())).map(mapper::toSimplePersonDTO).collect(toList());
 
     }
 
@@ -62,12 +62,12 @@ class PeopleService {
 
     SimplePersonDTO findOneSimple(int id) {
         Person person = repository.findById(id);
-        return mapper.simplify(person);
+        return mapper.toSimplePersonDTO(person);
     }
 
     private Set<SimplePersonDTO> getChildren(Set<Person> parents) {
         return repository.findChildren(parents).stream()
-                .map(mapper::simplify).collect(toSet());
+                .map(mapper::toSimplePersonDTO).collect(toSet());
     }
 
     private Set<SimplePersonDTO> getSiblings(int id) {
@@ -76,18 +76,18 @@ class PeopleService {
 
         return repository.findChildren(parents).stream()
                 .filter(sib -> sib.getId() != id) //remove self from children
-                .map(mapper::simplify).collect(Collectors.toSet());
+                .map(mapper::toSimplePersonDTO).collect(Collectors.toSet());
     }
 
     List<SimplePersonDTO> getSample() {
         return repository.findSome().stream()
-                .map(mapper::simplify).collect(toList());
+                .map(mapper::toSimplePersonDTO).collect(toList());
     }
 
 
     Set<SimplePersonDTO> getParents(int childId) {
         List<Person> parents = repository.findParents(childId);
-        return parents.stream().map(mapper::simplify).collect(toSet());
+        return parents.stream().map(mapper::toSimplePersonDTO).collect(toSet());
     }
 
 
@@ -96,7 +96,7 @@ class PeopleService {
     }
 
     List<SimplePersonDTO> search(String query, Set<Long> excludeIds) {
-        return repository.search(query).stream().filter(p -> !excludeIds.contains(p.getId())).map(mapper::simplify).collect(toList());
+        return repository.search(query).stream().filter(p -> !excludeIds.contains(p.getId())).map(mapper::toSimplePersonDTO).collect(toList());
     }
 
     List<SimplePersonDTO> getRecent() {
@@ -119,11 +119,11 @@ class PeopleService {
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
         Map<String, Relations> rel = person.getRelationships();
-        for(Map.Entry<String, Relations> entrySet: rel.entrySet()){
+        for (Map.Entry<String, Relations> entrySet : rel.entrySet()) {
             Relations relations = entrySet.getValue();
 
-            Set<Person> newPeopleSet =new HashSet<>();
-            for (Person other: relations.getPeople()){
+            Set<Person> newPeopleSet = new HashSet<>();
+            for (Person other : relations.getPeople()) {
                 newPeopleSet.add(repository.findById(other.getId()));
             }
             relations.setPeople(newPeopleSet);
@@ -135,24 +135,24 @@ class PeopleService {
     }
 
 
-     void savePhoto(long id, MultipartFile file) {
-        String ext = "dat";
-        String name = String.format("%s.%s", RandomStringUtils.randomAlphanumeric(8), ext);
+    String savePhoto(long id, MultipartFile file) {
+        String name = RandomStringUtils.randomAlphanumeric(20);
         Person p = repository.findById(id);
         p.setPhoto(name);
         repository.save(p);
-        storageService.save(id, name, file);
+        storageService.save(name, file);
+        return name;
     }
 
-     InputStream getPhoto(long id) throws IOException {
-        Person p = repository.findById(id);
+    InputStream getPhoto(String fileName) throws IOException {
 
-        if (p == null || p.getPhoto() == null) {
+        try {
+            return storageService.load(fileName).getInputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
             ClassLoader classLoader = this.getClass().getClassLoader();
-            return  classLoader.getResourceAsStream("no_photo.png");
-        } else {
-            String fileName = p.getPhoto();
-            return storageService.load(id, fileName).getInputStream();
+            return classLoader.getResourceAsStream("no_photo.png");
+
         }
     }
 }
