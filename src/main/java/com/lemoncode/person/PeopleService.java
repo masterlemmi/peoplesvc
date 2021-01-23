@@ -1,12 +1,17 @@
 package com.lemoncode.person;
 
 
+import com.lemoncode.file.FilesStorageService;
 import com.lemoncode.relationship.Relations;
 import com.lemoncode.relationship.RelationshipService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +34,9 @@ class PeopleService {
     @Autowired
     PersonMapper mapper;
 
+    @Autowired
+    FilesStorageService storageService;
+
     List<SimplePersonDTO> findAll() {
         return repository.findAll().stream().map(this.mapper::simplify).collect(Collectors.toList());
     }
@@ -42,7 +50,7 @@ class PeopleService {
     @Transactional
     PersonDTO findOne(int id) {
         Person person = repository.findById(id);
-        PersonDTO dto = mapper.personToPersonDTO(person);
+        PersonDTO dto = mapper.toPersonDTO(person);
 
         if (dto != null) {
             dto.setParents(getParents(id));
@@ -126,5 +134,25 @@ class PeopleService {
         return p;
     }
 
-   
+
+     void savePhoto(long id, MultipartFile file) {
+        String ext = "dat";
+        String name = String.format("%s.%s", RandomStringUtils.randomAlphanumeric(8), ext);
+        Person p = repository.findById(id);
+        p.setPhoto(name);
+        repository.save(p);
+        storageService.save(id, name, file);
+    }
+
+     InputStream getPhoto(long id) throws IOException {
+        Person p = repository.findById(id);
+
+        if (p == null || p.getPhoto() == null) {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            return  classLoader.getResourceAsStream("no_photo.png");
+        } else {
+            String fileName = p.getPhoto();
+            return storageService.load(id, fileName).getInputStream();
+        }
+    }
 }
