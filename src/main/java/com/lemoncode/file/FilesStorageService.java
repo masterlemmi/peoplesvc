@@ -9,9 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FilesStorageService {
 
 
-  public void save(long personId, String name,  MultipartFile file);
+  public void save(String name,  MultipartFile file);
 
-  public Resource load(long personId, String filename);
+  public Resource load(String filename);
 
   public void deleteAll();
 

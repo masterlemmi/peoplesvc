@@ -2,6 +2,7 @@ package com.lemoncode.person;
 
 import com.lemoncode.file.ResponseMessage;
 import com.lemoncode.relationship.RelationshipService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -72,9 +73,11 @@ public class PeopleResource {
     public ResponseEntity<ResponseMessage> saveImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
         String message = "";
         try {
-            peopleService.savePhoto(id, file);
+          String name =   peopleService.savePhoto(id, file);
             message = "Uploaded the file successfully: " + file.getOriginalFilename();
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+            ResponseMessage<String> res = new ResponseMessage<>(message);
+            res.setData(name);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
         } catch (Exception e) {
             e.printStackTrace();
             message = "Could not upload the file: " + file.getOriginalFilename() + "!";
@@ -101,13 +104,16 @@ public class PeopleResource {
 //    }
 
     @GetMapping(
-            value = "/{id}/image",
+            value = "/image/{fileName}",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
     public @ResponseBody
-    byte[] getImageWithMediaType(@PathVariable("id") Long id) throws IOException {
+    byte[] getImageWithMediaType(@PathVariable("fileName") String fileName) throws IOException {
 
-        InputStream in = peopleService.getPhoto(id);
+        if (StringUtils.isEmpty(fileName))
+            return new byte[]{};
+
+        InputStream in = peopleService.getPhoto(fileName);
         return org.apache.commons.io.IOUtils.toByteArray(in);
 
     }

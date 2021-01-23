@@ -49,7 +49,7 @@ class PersonMapperTest {
         assertEquals(DateConverter.toLocalDate("1949-01-21"), personDto.getDateOfDeath());
         assertTrue(personDto.isDeceased());
         assertNotNull(personDto.getAge());
-        assertNull( personDto.getPhotoUrl());
+        assertEquals("abcdefghijk.dat", personDto.getPhoto());
         assertEquals(1, personDto.getChildren().size());
         assertEquals("Juan DelaCruz", personDto.getFullName());
         assertEquals("JD", personDto.getInitials());
@@ -76,13 +76,13 @@ class PersonMapperTest {
         person.setAddress("Metro Manila");
         person.setDateOfBirth(DateConverter.toLocalDate("1919-01-21"));
         person.setDateOfDeath(null);
-        person.setPhoto("http://dummyimage.comasdaf");
+        person.setPhoto("abcdf.png");
         Person maria = new Person();
         maria.setFirstName("Maria");
         maria.setLastName("Dela Cruz");
         maria.setNickname("Marde");
         maria.setGender(GenderEnum.FEMALE);
-        maria.setPhoto("http://dummyimage.comasdaf");
+        maria.setPhoto("abcdef.png");
 
 
         person.setChildren(Set.of(maria));
@@ -102,7 +102,7 @@ class PersonMapperTest {
         assertNull(personDto.getDateOfDeath());
         assertFalse(personDto.isDeceased());
         assertNotNull(personDto.getAge());
-        assertEquals("api/people/1/image", personDto.getPhotoUrl());
+        assertEquals("api/people/image/abcdf.png", personDto.getPhotoUrl());
         assertEquals(personDto.getChildren().size(), 1);
         assertEquals("Juan DelaCruz", personDto.getFullName());
         assertEquals("JD", personDto.getInitials());
@@ -128,7 +128,7 @@ class PersonMapperTest {
         dto.setLastName("DelaCruz");
         dto.setNickname("Juan");
         dto.setGender("M");
-        dto.setPhotoUrl("http://dummyimage.comasdaf");
+        dto.setPhoto("abcdefg.jpg");
 
         //when
         Person person = PersonMapper.INSTANCE.toPerson(dto);
@@ -139,7 +139,7 @@ class PersonMapperTest {
         assertEquals(person.getLastName(), "DelaCruz");
         assertEquals(person.getNickname(), "Juan");
         assertEquals(person.getGender(), GenderEnum.MALE);
-        assertNull(person.getPhoto());
+        assertEquals("abcdefg.jpg", person.getPhoto());
 
     }
 
@@ -151,7 +151,7 @@ class PersonMapperTest {
         dto.setLastName("DelaCruz");
         dto.setNickname("Juan");
         dto.setGender("M");
-        dto.setPhotoUrl("http://dummyimage.comasdaf");
+        dto.setPhoto("abcdfh");
         dto.setEmail("test@email.com");
         dto.setAddress("Metro Manila");
         dto.setDateOfBirth(DateConverter.toLocalDate("1919-01-21"));
@@ -196,7 +196,7 @@ class PersonMapperTest {
         assertEquals(DateConverter.toLocalDate("1950-01-20"), person.getDateOfDeath());
         System.out.println(person.getDateOfDeath());
         assertNotNull(person.getDateOfBirth());
-        assertEquals(null, person.getPhoto());
+        assertEquals("abcdfh", person.getPhoto());
         assertEquals("hello world", person.getNotes());
         assertEquals(person.getChildren().size(), 1);
         Person child = person.getChildren().iterator().next();

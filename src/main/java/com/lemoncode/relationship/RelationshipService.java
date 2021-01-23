@@ -46,7 +46,7 @@ public class RelationshipService {
 //                System.out.println("--------+> relation labels found:" + labels.size());
 //                labels.forEach(x -> System.out.println("----> " + x.getLabel()));
 //                for (RelationshipLabel label : labels) {
-//                    SimplePersonDTO other = PersonMapper.INSTANCE.simplify(rel.getPerson2());
+//                    SimplePersonDTO other = PersonMapper.INSTANCE.toSimplePersonDTO(rel.getPerson2());
 //                    //  other.setRelationshipLabel(label.getLabel());
 //
 //                    if (map.get(label.getLabel()) == null) {
@@ -62,7 +62,7 @@ public class RelationshipService {
 //                Set<RelationshipLabel> labels = rel.getRelation(); //
 //                System.out.println("--------> relation labels found:" + labels.size());
 //                for (RelationshipLabel label : labels) {
-//                    SimplePersonDTO other = PersonMapper.INSTANCE.simplify(rel.getPerson1());
+//                    SimplePersonDTO other = PersonMapper.INSTANCE.toSimplePersonDTO(rel.getPerson1());
 //                    System.out.println("---> label: " + label.getLabel() + " " + label.getOppositeLabel());
 //                    //other.setRelationshipLabel(label.getOppositeLabel());
 //                    if (map.get(label.getOppositeLabel()) == null) {
@@ -91,7 +91,7 @@ public class RelationshipService {
 //        for (Relations rel : rels) {
 //            if (personId == rel.getPerson1().getId()) {
 //                //id = the main person (person1) so we want the name of the other person (person2)
-//                SimplePersonDTO other = PersonMapper.INSTANCE.simplify(rel.getPerson2());
+//                SimplePersonDTO other = PersonMapper.INSTANCE.toSimplePersonDTO(rel.getPerson2());
 //                Set<RelationshipLabel> labels = rel.getRelation(); //
 //                for (RelationshipLabel label : labels) {
 //
@@ -108,7 +108,7 @@ public class RelationshipService {
 //                }
 //            } else {
 //                //personID = the other person(person2) so we want the name of person1
-//                SimplePersonDTO other = PersonMapper.INSTANCE.simplify(rel.getPerson1());
+//                SimplePersonDTO other = PersonMapper.INSTANCE.toSimplePersonDTO(rel.getPerson1());
 //                Set<RelationshipLabel> labels = rel.getRelation(); //
 //                for (RelationshipLabel label : labels) {
 //

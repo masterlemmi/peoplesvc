@@ -25,6 +25,7 @@ public class PersonDTO {
     private String nickname;
     private String fullName;
     private String initials;
+    private String photo;
     private String photoUrl;
     private String email;
     private String address;
@@ -41,6 +42,5 @@ public class PersonDTO {
     private List<RelationshipDTO> relationships = new ArrayList<>(); //possibility of multiple parents
     private Set<LinkDTO> links = new HashSet<>();
     private String notes;
-
 
 }
