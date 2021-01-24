@@ -3,9 +3,13 @@ package com.lemoncode.person;
 
 import com.lemoncode.file.FilesStorageService;
 import com.lemoncode.relationship.Relations;
+import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -15,8 +19,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 
 @Service
 class PeopleService {
@@ -44,7 +47,7 @@ class PeopleService {
     }
 
     @Transactional
-    PersonDTO findOne(int id) {
+    PersonDTO findOne(Long id) {
         Person person = repository.findById(id);
         PersonDTO dto = mapper.toPersonDTO(person);
 
@@ -66,7 +69,7 @@ class PeopleService {
                 .map(mapper::toSimplePersonDTO).collect(toSet());
     }
 
-    private Set<SimplePersonDTO> getSiblings(int id) {
+    private Set<SimplePersonDTO> getSiblings(Long id) {
         //TODO: create direct query without having to query parents first;
         Set<Person> parents = new HashSet<>(repository.findParents(id));
 
@@ -81,7 +84,7 @@ class PeopleService {
     }
 
 
-    Set<SimplePersonDTO> getParents(int childId) {
+    Set<SimplePersonDTO> getParents(Long childId) {
         List<Person> parents = repository.findParents(childId);
         return parents.stream().map(mapper::toSimplePersonDTO).collect(toSet());
     }
@@ -101,7 +104,7 @@ class PeopleService {
     }
 
     SimplePersonDTO createSimplePerson(SimplePersonDTO p) {
-        System.out.println("received, " + p);
+
         Person person = new Person();
         person.setFirstName(p.getFirstName());
         person.setLastName(p.getLastName());
@@ -110,70 +113,6 @@ class PeopleService {
         p.setId(saved.getId());
         p.setFullName(p.getFirstName() + " " + p.getLastName());
         return p;
-    }
-
-    public PersonDTO createPerson(PersonDTO p) {
-        Person person = this.mapper.toPerson(p);
-        Map<String, Relations> rel = person.getRelationships();
-        Map<String, Relations> newRel =new HashMap<>();
-
-        Map<String, Set<Person>> otherDirection = new HashMap<>();
-
-        for (Map.Entry<String, Relations> entrySet : rel.entrySet()) {
-            Relations relations = entrySet.getValue();
-
-            Set<Person> newPeopleSet = new HashSet<>();
-            for (Person other : relations.getPeople()) {
-                Person savedOther = repository.findById(other.getId());
-                newPeopleSet.add(savedOther);
-            }
-            relations.setPeople(newPeopleSet);
-            String newKey = entrySet.getKey().toUpperCase();
-
-            //handle Other direction of relationshps (e.g. create a husband entry for other person  if i tagged her as wife);
-            if (labelService.isSupportedLabel(newKey)){
-                String oppositeLabel = labelService.getOppositeLabel(newKey, person.getGender()); //e.g. wife/husband depending on my gender //
-                otherDirection.put(oppositeLabel, newPeopleSet);
-            }
-
-            newRel.put(newKey, relations);
-        }
-
-        person.setRelationships(newRel);
-
-        Person saved = repository.save(person);
-        p.setId(saved.getId());
-
-        handleRelationBiDirections(saved, otherDirection);
-
-        return p;
-    }
-
-
-
-    // create opposite associates from the relations defined
-    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
-    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender
-    private void handleRelationBiDirections(Person main, Map<String, Set<Person>> otherDirection) {
-       for (Map.Entry<String, Set<Person>> entry: otherDirection.entrySet()){
-            String oppositeLabel = entry.getKey();
-           for (Person otherPerson: entry.getValue()){
-                Map<String, Relations> otherRels = otherPerson.getRelationships();
-
-                Relations existingRel = otherRels.get(oppositeLabel);
-
-                if (existingRel == null){
-                    Relations newRelations = new Relations();
-                    newRelations.addPerson(main);
-                    otherRels.put(oppositeLabel, newRelations);
-                } else { //there is an existing list of people so just add main to the list
-                   existingRel.addPerson(main);
-                }
-
-                //save the update relationship
-               repository.save(otherPerson);
-            }
-       }
     }
 
 
@@ -196,5 +135,25 @@ class PeopleService {
             return classLoader.getResourceAsStream("no_photo.png");
 
         }
+    }
+
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public PersonDTO createPerson(PersonDTO p) {
+        Person person = this.mapper.toPerson(p);
+        Map<String, Relations> rel = person.getRelationships();
+        for (Map.Entry<String, Relations> entrySet : rel.entrySet()) {
+            Relations relations = entrySet.getValue();
+            Set<Person> newPeopleSet = new HashSet<>();
+            for (Person other : relations.getPeople()) {
+                newPeopleSet.add(repository.findById(other.getId()));
+            }
+            relations.setPeople(newPeopleSet);
+            Person saved = repository.save(person);
+            p.setId(saved.getId());
+
+
+        }
+        return p;
     }
 }

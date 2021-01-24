@@ -42,7 +42,7 @@ public abstract class PersonMapper {
                 .collect(Collectors.joining());
         p.setInitials(initials);
         p.setGender(p.getGender().equals("MALE") ? "M" : "F");
-        if (p.getPhoto() != null){
+        if (p.getPhoto() != null) {
             p.setPhotoUrl(IMAGE_URL + p.getPhoto());
         }
 
@@ -52,6 +52,27 @@ public abstract class PersonMapper {
     @Mapping(target = "initials", ignore = true)
     @Mapping(target = "photoUrl", ignore = true)
     public abstract SimplePersonDTO toSimplePersonDTO(Person person);
+
+
+    public SimplePersonDTO toSimplePersonDTO(PersonDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        SimplePersonDTO simplePersonDTO = new SimplePersonDTO();
+
+        simplePersonDTO.setFirstName(dto.getFirstName());
+        simplePersonDTO.setLastName(dto.getLastName());
+        simplePersonDTO.setId(dto.getId());
+        simplePersonDTO.setNickname(dto.getNickname());
+        simplePersonDTO.setGender(dto.getGender());
+        simplePersonDTO.setPhoto(dto.getPhoto());
+        simplePersonDTO.setFullName( dto.getFirstName() + " " + dto.getLastName() );
+        after(simplePersonDTO);
+        return simplePersonDTO;
+    }
+
+
 
     @AfterMapping
     void after(@MappingTarget SimplePersonDTO simple) {
@@ -63,7 +84,7 @@ public abstract class PersonMapper {
                 .collect(Collectors.joining());
         simple.setInitials(initials);
         simple.setGender(simple.getGender().equals("MALE") ? "M" : "F");
-        if (simple.getPhoto() != null){
+        if (simple.getPhoto() != null) {
             simple.setPhotoUrl(IMAGE_URL + simple.getPhoto());
         }
     }
@@ -123,7 +144,6 @@ public abstract class PersonMapper {
     }
 
 
-
     @Mapping(target = "person", ignore = true)
     public abstract Link toLink(LinkDTO dto);
 
@@ -137,7 +157,6 @@ public abstract class PersonMapper {
         }
         return map;
     }
-
 
 
 }

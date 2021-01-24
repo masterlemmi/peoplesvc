@@ -87,7 +87,7 @@ public class PeopleRepository {
     }
 
 
-    public List<Person> findParents(int childId) {
+    public List<Person> findParents(Long childId) {
         try {
             this.entityManager.clear();
             CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -113,8 +113,6 @@ public class PeopleRepository {
 
     @Transactional
     public Person save(Person Person) {
-
-
         if (Person.getId() == null) {
             this.entityManager.persist(Person);
             return Person;
@@ -155,8 +153,9 @@ public class PeopleRepository {
 
             query.where(cb.equal(root.get(Person_.id), id));
             //perform query
-            return this.entityManager.createQuery(query).setHint("javax.persistence.fetchgraph", entityGraph)
-.getSingleResult();
+            return this.entityManager.createQuery(query)
+                    .setHint("javax.persistence.fetchgraph", entityGraph)
+                    .getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

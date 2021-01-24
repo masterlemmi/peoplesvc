@@ -38,7 +38,7 @@ public class Relations {
     }
 
     @ManyToMany(
-            cascade = CascadeType.ALL
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REMOVE, CascadeType.REFRESH}
     )
     @JoinTable(name = "relations_people",
             joinColumns = @JoinColumn(name = "relations_id"),

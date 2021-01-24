@@ -11,17 +11,20 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
+    @ToString.Include
     private Long id;
-    @EqualsAndHashCode.Include
+	@EqualsAndHashCode.Include
+    @ToString.Include
     @Column(nullable = false)
     private String firstName;
-    @EqualsAndHashCode.Include
+	@EqualsAndHashCode.Include
+    @ToString.Include
     @Column(nullable = false)
     private String lastName;
     private String nickname;
@@ -30,10 +33,12 @@ public class Person {
     private String email;
     private String notes;
     @Enumerated(EnumType.STRING)
-    @EqualsAndHashCode.Include
+	@EqualsAndHashCode.Include
+    @ToString.Include
     @Column(nullable = false)
     private @NonNull GenderEnum gender;
-    @EqualsAndHashCode.Include
+	@EqualsAndHashCode.Include
+    @ToString.Include
     private LocalDate dateOfBirth;
     private LocalDate dateOfDeath;
 
