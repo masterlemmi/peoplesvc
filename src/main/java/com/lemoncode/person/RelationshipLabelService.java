@@ -4,16 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.text.WordUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Component
@@ -26,6 +23,8 @@ public class RelationshipLabelService {
 
     private Map<String, Label> labelsMap = new HashMap<>();
 
+    private Set<String> labelsSet = new HashSet<>();
+
     @PostConstruct
     public void init() {
         for (String label : this.relationshipLabels) {
@@ -36,6 +35,10 @@ public class RelationshipLabelService {
                 labelsMap.put(array[0].toUpperCase(), new Label(array[1].toUpperCase(), array[2].toUpperCase()));
             } else {
                 System.out.println("Cant create mapping for label " + label + " with size : " + array.length);
+            }
+
+            for (String s : array) {
+                labelsSet.add(WordUtils.capitalizeFully(s));
             }
         }
 
@@ -72,10 +75,13 @@ public class RelationshipLabelService {
         }
 
         public String get(GenderEnum gender) {
-            switch (gender){
-                case MALE: return maleLabel;
-                case FEMALE: return femLabel;
-                default: throw new UnsupportedOperationException();
+            switch (gender) {
+                case MALE:
+                    return maleLabel;
+                case FEMALE:
+                    return femLabel;
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
     }

@@ -3,6 +3,7 @@ package com.lemoncode.person;
 
 import com.lemoncode.relationship.Relations;
 import com.lemoncode.relationship.RelationshipDTO;
+import org.apache.commons.text.WordUtils;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -73,7 +74,8 @@ public abstract class PersonMapper {
         for (Map.Entry<String, Relations> entrySet : relationsMap.entrySet()) {
 
             RelationshipDTO dto = new RelationshipDTO();
-            dto.setLabel(entrySet.getKey());
+            String label = WordUtils.capitalizeFully(entrySet.getKey());
+            dto.setLabel(label);
             Set<SimplePersonDTO> people = entrySet.getValue().getPeople().stream().map(this::toSimplePersonDTO).collect(toSet());
             dto.setPeople(people);
             list.add(dto);

@@ -27,6 +27,9 @@ public class PeopleResource {
     @Autowired
     private PeopleService peopleService;
 
+    @Autowired
+    RelationshipLabelService labelService;
+
 
     @PostMapping("/simple")
     public SimplePersonDTO createSimplePerson(@RequestBody SimplePersonDTO p) {
@@ -113,6 +116,12 @@ public class PeopleResource {
         InputStream in = peopleService.getPhoto(fileName);
         return org.apache.commons.io.IOUtils.toByteArray(in);
 
+    }
+
+
+    @GetMapping("/labels")
+    public Set<String> getLabels() {
+        return labelService.getLabelsSet();
     }
 
 }
