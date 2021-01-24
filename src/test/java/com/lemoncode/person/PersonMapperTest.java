@@ -2,6 +2,7 @@ package com.lemoncode.person;
 
 import com.lemoncode.relationship.RelationshipDTO;
 import com.lemoncode.util.DateConverter;
+import org.apache.commons.text.WordUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,11 +13,15 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PersonMapperTest {
+
+
+
+
     @Test
     public void toPersonDTO() {
         Person person = new Person();
         person.setFirstName("Juan");
-        person.setLastName("DelaCruz");
+        person.setLastName("Dela cruz");
         person.setNickname("Juan");
         person.setEmail("juandelazrcuz@mgail.com");
         person.setGender(GenderEnum.MALE);
@@ -40,7 +45,7 @@ class PersonMapperTest {
         //then
         assertNotNull(personDto);
         assertEquals("Juan", personDto.getFirstName());
-        assertEquals("DelaCruz", personDto.getLastName());
+        assertEquals("Dela Cruz", personDto.getLastName());
         assertEquals("Juan", personDto.getNickname());
         assertEquals("juandelazrcuz@mgail.com", personDto.getEmail());
         assertEquals("M", personDto.getGender());
@@ -51,8 +56,8 @@ class PersonMapperTest {
         assertNotNull(personDto.getAge());
         assertEquals("abcdefghijk.dat", personDto.getPhoto());
         assertEquals(1, personDto.getChildren().size());
-        assertEquals("Juan DelaCruz", personDto.getFullName());
-        assertEquals("JD", personDto.getInitials());
+        assertEquals("Juan Dela Cruz", personDto.getFullName());
+        assertEquals("JDC", personDto.getInitials());
 
 
         SimplePersonDTO simple = personDto.getChildren().iterator().next();
@@ -69,7 +74,7 @@ class PersonMapperTest {
         Person person = new Person();
         person.setId(1l);
         person.setFirstName("Juan");
-        person.setLastName("DelaCruz");
+        person.setLastName("Dela Cruz");
         person.setNickname("Juan");
         person.setEmail("juandelazrcuz@mgail.com");
         person.setGender(GenderEnum.MALE);
@@ -93,19 +98,19 @@ class PersonMapperTest {
         //then
         assertNotNull(personDto);
         assertEquals("Juan", personDto.getFirstName());
-        assertEquals("DelaCruz", personDto.getLastName());
-        assertEquals("Juan" ,personDto.getNickname());
+        assertEquals("Dela Cruz", personDto.getLastName());
+        assertEquals("Juan", personDto.getNickname());
         assertEquals("juandelazrcuz@mgail.com", personDto.getEmail());
-        assertEquals("M" ,personDto.getGender());
-        assertEquals("Metro Manila" ,personDto.getAddress());
+        assertEquals("M", personDto.getGender());
+        assertEquals("Metro Manila", personDto.getAddress());
 
         assertNull(personDto.getDateOfDeath());
         assertFalse(personDto.isDeceased());
         assertNotNull(personDto.getAge());
         assertEquals("api/people/image/abcdf.png", personDto.getPhotoUrl());
         assertEquals(personDto.getChildren().size(), 1);
-        assertEquals("Juan DelaCruz", personDto.getFullName());
-        assertEquals("JD", personDto.getInitials());
+        assertEquals("Juan Dela Cruz", personDto.getFullName());
+        assertEquals("JDC", personDto.getInitials());
 
         SimplePersonDTO simple = personDto.getChildren().iterator().next();
         assertEquals("Dela Cruz", simple.getLastName());
@@ -116,7 +121,6 @@ class PersonMapperTest {
         assertEquals("MDC", simple.getInitials());
 
 
-
     }
 
 
@@ -125,7 +129,7 @@ class PersonMapperTest {
         SimplePersonDTO dto = new SimplePersonDTO();
         dto.setId(1L);
         dto.setFirstName("Juan");
-        dto.setLastName("DelaCruz");
+        dto.setLastName("Dela Cruz");
         dto.setNickname("Juan");
         dto.setGender("M");
         dto.setPhoto("abcdefg.jpg");
@@ -136,7 +140,7 @@ class PersonMapperTest {
         //then
         assertNotNull(person);
         assertEquals(person.getFirstName(), "Juan");
-        assertEquals(person.getLastName(), "DelaCruz");
+        assertEquals(person.getLastName(), "Dela Cruz");
         assertEquals(person.getNickname(), "Juan");
         assertEquals(person.getGender(), GenderEnum.MALE);
         assertEquals("abcdefg.jpg", person.getPhoto());
@@ -148,7 +152,7 @@ class PersonMapperTest {
         PersonDTO dto = new PersonDTO();
         dto.setId(1L);
         dto.setFirstName("Juan");
-        dto.setLastName("DelaCruz");
+        dto.setLastName("Dela Cruz");
         dto.setNickname("Juan");
         dto.setGender("M");
         dto.setPhoto("abcdfh");
@@ -188,7 +192,7 @@ class PersonMapperTest {
         //then
         assertNotNull(person);
         assertEquals(person.getFirstName(), "Juan");
-        assertEquals(person.getLastName(), "DelaCruz");
+        assertEquals(person.getLastName(), "Dela Cruz");
         assertEquals(person.getNickname(), "Juan");
         assertEquals("test@email.com", person.getEmail());
         assertEquals(person.getGender(), GenderEnum.MALE);

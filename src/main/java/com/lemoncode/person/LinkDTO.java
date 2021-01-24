@@ -1,6 +1,7 @@
 package com.lemoncode.person;
 
 import lombok.*;
+import org.apache.commons.text.WordUtils;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,4 +18,10 @@ public class LinkDTO {
     private Long id;
     private String name;
     private String url;
+
+    public void setName(String name) {
+        if (name != null) {
+            this.name = WordUtils.capitalizeFully((name.toLowerCase()));
+        }
+    }
 }

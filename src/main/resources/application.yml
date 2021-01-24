@@ -36,6 +36,19 @@ spring:
     hibernate:
       use-new-id-generator-mappings: false
       ddl-auto: validate
+relationshipLabels:
+  #key, value(M), value(F)
+  - wife,husband,wife
+  - husband,husband,wife
+  - bestfriend
+  - ex
+  - boyfriend,boyfriend,girlfriend
+  - girlfriend,boyfriend,girlfriend
+  - ninong,inaanak,inaanak
+  - ninang,inaanak,inaanak
+  - inaanak,ninong,ninang
+  - barkada
+
 #logging:
 #  level:
 #    org:

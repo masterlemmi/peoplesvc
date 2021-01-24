@@ -2,12 +2,14 @@ package com.lemoncode.person;
 
 import com.lemoncode.relationship.RelationshipDTO;
 import lombok.*;
+import org.apache.commons.text.WordUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Getter
 @Setter
@@ -42,5 +44,23 @@ public class PersonDTO {
     private List<RelationshipDTO> relationships = new ArrayList<>(); //possibility of multiple parents
     private Set<LinkDTO> links = new HashSet<>();
     private String notes;
+
+    public void setFirstName(String firstName) {
+        if (firstName != null) {
+            this.firstName = WordUtils.capitalizeFully((firstName.toLowerCase()));
+        }
+    }
+
+    public void setLastName(String lastName) {
+        if (lastName != null) {
+            this.lastName = WordUtils.capitalizeFully(lastName.toLowerCase());
+        }
+    }
+
+    public void setFullName(String fullName) {
+        if (fullName != null) {
+            this.fullName = WordUtils.capitalizeFully(fullName.toLowerCase());
+        }
+    }
 
 }

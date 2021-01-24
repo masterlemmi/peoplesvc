@@ -2,6 +2,7 @@ package com.lemoncode.person;
 
 
 import lombok.*;
+import org.apache.commons.text.WordUtils;
 
 @Getter
 @Setter
@@ -27,6 +28,25 @@ public class SimplePersonDTO {
     private String photo;
     private String photoUrl;
     private String initials;
+
+
+    public void setFirstName(String firstName) {
+        if (firstName != null) {
+            this.firstName = WordUtils.capitalizeFully(firstName.toLowerCase());
+        }
+    }
+
+    public void setLastName(String lastName) {
+        if (lastName != null) {
+            this.lastName = WordUtils.capitalizeFully(lastName.toLowerCase());
+        }
+    }
+
+    public void setFullName(String fullName) {
+        if (fullName != null) {
+            this.fullName = WordUtils.capitalizeFully(fullName.toLowerCase());
+        }
+    }
 
 
 }

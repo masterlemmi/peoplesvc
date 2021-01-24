@@ -3,7 +3,6 @@ package com.lemoncode.person;
 
 import com.lemoncode.file.FilesStorageService;
 import com.lemoncode.relationship.Relations;
-import com.lemoncode.relationship.RelationshipService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -29,13 +25,13 @@ class PeopleService {
     PeopleRepository repository;
 
     @Autowired
-    RelationshipService relService;
-
-    @Autowired
     PersonMapper mapper;
 
     @Autowired
     FilesStorageService storageService;
+
+    @Autowired
+    RelationshipLabelService labelService;
 
     List<SimplePersonDTO> findAll() {
         return repository.findAll().stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
@@ -119,19 +115,65 @@ class PeopleService {
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
         Map<String, Relations> rel = person.getRelationships();
+        Map<String, Relations> newRel = person.getRelationships();
+
+        Map<String, Set<Person>> otherDirection = new HashMap<>();
+
         for (Map.Entry<String, Relations> entrySet : rel.entrySet()) {
             Relations relations = entrySet.getValue();
 
             Set<Person> newPeopleSet = new HashSet<>();
             for (Person other : relations.getPeople()) {
-                newPeopleSet.add(repository.findById(other.getId()));
+                Person savedOther = repository.findById(other.getId());
+                newPeopleSet.add(savedOther);
             }
             relations.setPeople(newPeopleSet);
+            String newKey = entrySet.getKey().toUpperCase();
+
+            //handle Other direction of relationshps (e.g. create a husband entry for other person  if i tagged her as wife);
+            if (labelService.isSupportedLabel(newKey)){
+                String oppositeLabel = labelService.getOppositeLabel(newKey, person.getGender()); //e.g. wife/husband depending on my gender //
+                otherDirection.put(oppositeLabel, newPeopleSet);
+            }
+
+            newRel.put(newKey, relations);
         }
+
+        person.setRelationships(newRel);
 
         Person saved = repository.save(person);
         p.setId(saved.getId());
+
+        handleRelationBiDirections(saved, otherDirection);
+
         return p;
+    }
+
+
+
+    // create opposite associates from the relations defined
+    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
+    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender
+    private void handleRelationBiDirections(Person main, Map<String, Set<Person>> otherDirection) {
+       for (Map.Entry<String, Set<Person>> entry: otherDirection.entrySet()){
+            String oppositeLabel = entry.getKey();
+           for (Person otherPerson: entry.getValue()){
+                Map<String, Relations> otherRels = otherPerson.getRelationships();
+
+                Relations existingRel = otherRels.get(oppositeLabel);
+
+                if (existingRel == null){
+                    Relations newRelations = new Relations();
+                    newRelations.addPerson(main);
+                    otherRels.put(oppositeLabel, newRelations);
+                } else { //there is an existing list of people so just add main to the list
+                   existingRel.addPerson(main);
+                }
+
+                //save the update relationship
+               repository.save(otherPerson);
+            }
+       }
     }
 
 

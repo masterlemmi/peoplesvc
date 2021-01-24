@@ -1,7 +1,6 @@
 package com.lemoncode.person;
 
 import com.lemoncode.file.ResponseMessage;
-import com.lemoncode.relationship.RelationshipService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,8 +27,6 @@ public class PeopleResource {
     @Autowired
     private PeopleService peopleService;
 
-    @Autowired
-    private RelationshipService relService;
 
     @PostMapping("/simple")
     public SimplePersonDTO createSimplePerson(@RequestBody SimplePersonDTO p) {
