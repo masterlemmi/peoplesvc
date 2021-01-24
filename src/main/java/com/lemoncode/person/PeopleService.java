@@ -115,7 +115,7 @@ class PeopleService {
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
         Map<String, Relations> rel = person.getRelationships();
-        Map<String, Relations> newRel = person.getRelationships();
+        Map<String, Relations> newRel =new HashMap<>();
 
         Map<String, Set<Person>> otherDirection = new HashMap<>();
 
