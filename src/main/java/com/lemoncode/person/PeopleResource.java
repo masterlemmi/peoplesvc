@@ -43,6 +43,10 @@ public class PeopleResource {
     public PersonDTO createPerson(@RequestBody PersonDTO p) {
         PersonDTO dto = peopleService.createPerson(p);
 
+        if (CollectionUtils.isEmpty(p.getRelationships())){
+            return dto;
+        }
+
         //  // create opposite associates from the relations defined
         //    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
         //    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender

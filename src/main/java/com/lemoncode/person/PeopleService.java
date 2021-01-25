@@ -138,7 +138,7 @@ class PeopleService {
     }
 
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
+
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
         Map<String, Relations> rel = person.getRelationships();
@@ -149,11 +149,10 @@ class PeopleService {
                 newPeopleSet.add(repository.findById(other.getId()));
             }
             relations.setPeople(newPeopleSet);
-            Person saved = repository.save(person);
-            p.setId(saved.getId());
+      }
 
-
-        }
+        Person saved = repository.save(person);
+        p.setId(saved.getId());
         return p;
     }
 }
