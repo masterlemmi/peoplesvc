@@ -122,7 +122,8 @@ public class PeopleRepository {
     }
 
     @Transactional
-    public void save(List<Person> people) {
+    public List<Person> save(List<Person> people) {
+
         int i = 0;
         for (Person p : people) {
             if (++i % 20 == 0) {
@@ -135,6 +136,8 @@ public class PeopleRepository {
                 this.entityManager.merge(p);
             }
         }
+
+        return people;
     }
 
     @Transactional

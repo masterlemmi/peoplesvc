@@ -41,7 +41,7 @@ public class PeopleResource {
     }
 
     @PostMapping("/batch")
-    public ResponseEntity createPerson(@RequestBody String batch) {
+    public List<SimplePersonDTO> createPerson(@RequestBody String batch) {
 
         //validate each row
         String[] entries = batch.split("\n");
@@ -49,7 +49,7 @@ public class PeopleResource {
         List<Person> people = new ArrayList<>();
         for (String row : entries) {
             if (!PersonValidator.isValidBatchRow(row.trim())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(row + " does not match Pattern: John/Smith/M"));
+                throw new BadRequestException(row + " does not match Pattern: John/Smith/M");
             }
             String[] arr = row.split("/");
             Person p = new Person();
@@ -60,13 +60,12 @@ public class PeopleResource {
         }
 
         try {
-            peopleService.save(people);
+            return peopleService.save(people);
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Entry/Entries already existing in db"));
+            throw new BadRequestException("Entry/Entries already existing in db");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            throw new RuntimeException("Server Error: " + e.getMessage());
         }
-        return ResponseEntity.status(200).build();
     }
 
     @PostMapping()

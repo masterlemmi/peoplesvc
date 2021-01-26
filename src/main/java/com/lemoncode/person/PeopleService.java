@@ -155,9 +155,9 @@ class PeopleService {
         return p;
     }
 
-    public void save(List<Person> people) {
+    public List<SimplePersonDTO> save(List<Person> people) {
 
-        repository.save(people);
+        return repository.save(people).stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
 
     }
 }
