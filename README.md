@@ -26,3 +26,6 @@ docker run -p8081:8081 peoplesvc
 ###  DEPLOY
 - enable security by uncomenting SecurityConfig
 - re-enable cor
+
+
+### TODO

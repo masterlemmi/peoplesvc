@@ -3,23 +3,23 @@ package com.lemoncode.person;
 
 import com.lemoncode.file.FilesStorageService;
 import com.lemoncode.relationship.Relations;
-import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 class PeopleService {
@@ -138,7 +138,6 @@ class PeopleService {
     }
 
 
-
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
         Map<String, Relations> rel = person.getRelationships();
@@ -149,10 +148,16 @@ class PeopleService {
                 newPeopleSet.add(repository.findById(other.getId()));
             }
             relations.setPeople(newPeopleSet);
-      }
+        }
 
         Person saved = repository.save(person);
         p.setId(saved.getId());
         return p;
+    }
+
+    public void save(List<Person> people) {
+
+        repository.save(people);
+
     }
 }

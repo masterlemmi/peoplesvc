@@ -4,6 +4,7 @@ import com.lemoncode.file.ResponseMessage;
 import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,18 +40,47 @@ public class PeopleResource {
         return peopleService.createSimplePerson(p);
     }
 
+    @PostMapping("/batch")
+    public ResponseEntity createPerson(@RequestBody String batch) {
+
+        //validate each row
+        String[] entries = batch.split("\n");
+
+        List<Person> people = new ArrayList<>();
+        for (String row : entries) {
+            if (!PersonValidator.isValidBatchRow(row.trim())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(row + " does not match Pattern: John/Smith/M"));
+            }
+            String[] arr = row.split("/");
+            Person p = new Person();
+            p.setFirstName(arr[0].trim());
+            p.setLastName(arr[1].trim());
+            p.setGender(GenderEnum.from(arr[2].trim()));
+            people.add(p);
+        }
+
+        try {
+            peopleService.save(people);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Entry/Entries already existing in db"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.status(200).build();
+    }
+
     @PostMapping()
     public PersonDTO createPerson(@RequestBody PersonDTO p) {
         PersonDTO dto = peopleService.createPerson(p);
 
-        if (CollectionUtils.isEmpty(p.getRelationships())){
+        if (CollectionUtils.isEmpty(p.getRelationships())) {
             return dto;
         }
 
         //  // create opposite associates from the relations defined
         //    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
         //    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender
-       SimplePersonDTO main = this.mapper.toSimplePersonDTO(dto);
+        SimplePersonDTO main = this.mapper.toSimplePersonDTO(dto);
 
         for (RelationshipDTO reldto : dto.getRelationships()) {
             String label = reldto.getLabel().toUpperCase();
@@ -65,7 +95,7 @@ public class PeopleResource {
                 PersonDTO other = peopleService.findOne(simpleDTO.getId());
 
                 Map<String, Set<SimplePersonDTO>> otherRels = other.getRelationships()
-                        .stream().collect(toMap( rel -> rel.getLabel().toUpperCase(), RelationshipDTO::getPeople));
+                        .stream().collect(toMap(rel -> rel.getLabel().toUpperCase(), RelationshipDTO::getPeople));
 
                 Set<SimplePersonDTO> existingRel = otherRels.get(oppositeLabel);
 

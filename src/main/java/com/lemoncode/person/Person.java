@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Entity(name = "PEOPLE")
+@Table(name = "PEOPLE", uniqueConstraints = {@UniqueConstraint(columnNames = {"firstName", "lastName", "gender"})})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,11 +20,11 @@ public class Person {
     @EqualsAndHashCode.Include
     @ToString.Include
     private Long id;
-	@EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include
     @ToString.Include
     @Column(nullable = false)
     private String firstName;
-	@EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include
     @ToString.Include
     @Column(nullable = false)
     private String lastName;
@@ -33,11 +34,11 @@ public class Person {
     private String email;
     private String notes;
     @Enumerated(EnumType.STRING)
-	@EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include
     @ToString.Include
     @Column(nullable = false)
     private @NonNull GenderEnum gender;
-	@EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include
     @ToString.Include
     private LocalDate dateOfBirth;
     private LocalDate dateOfDeath;
@@ -59,11 +60,11 @@ public class Person {
     @MapKeyColumn(name = "label")
     private Map<String, Relations> relationships = new HashMap<>();
 
-    public void addRelationship(String label, Relations rel){
+    public void addRelationship(String label, Relations rel) {
         this.relationships.put(label, rel);
     }
 
-    public void removeRelationship(String label){
+    public void removeRelationship(String label) {
         this.relationships.remove(label);
     }
 

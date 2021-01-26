@@ -122,6 +122,22 @@ public class PeopleRepository {
     }
 
     @Transactional
+    public void save(List<Person> people) {
+        int i = 0;
+        for (Person p : people) {
+            if (++i % 20 == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+            if (p.getId() == null) {
+                this.entityManager.persist(p);
+            } else {
+                this.entityManager.merge(p);
+            }
+        }
+    }
+
+    @Transactional
     public int deleteById(long id) {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         // create delete
