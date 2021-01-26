@@ -1,7 +1,6 @@
 package com.lemoncode.person;
 
 import com.lemoncode.file.ResponseMessage;
-import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -72,7 +71,7 @@ public class PeopleResource {
     public PersonDTO createPerson(@RequestBody PersonDTO p) {
         PersonDTO dto = peopleService.createPerson(p);
 
-        if (CollectionUtils.isEmpty(p.getRelationships())) {
+        if (CollectionUtils.isEmpty(p.getRelationships()) && CollectionUtils.isEmpty(p.getParents())) {
             return dto;
         }
 
@@ -80,44 +79,8 @@ public class PeopleResource {
         //    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
         //    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender
         SimplePersonDTO main = this.mapper.toSimplePersonDTO(dto);
-
-        for (RelationshipDTO reldto : dto.getRelationships()) {
-            String label = reldto.getLabel().toUpperCase();
-
-            if (!labelService.isSupportedLabel(label))
-                continue;
-
-            String oppositeLabel = labelService.getOppositeLabel(label, GenderEnum.from(p.getGender()));
-            Set<SimplePersonDTO> people = reldto.getPeople();
-
-            for (SimplePersonDTO simpleDTO : people) {
-                PersonDTO other = peopleService.findOne(simpleDTO.getId());
-
-                Map<String, Set<SimplePersonDTO>> otherRels = other.getRelationships()
-                        .stream().collect(toMap(rel -> rel.getLabel().toUpperCase(), RelationshipDTO::getPeople));
-
-                Set<SimplePersonDTO> existingRel = otherRels.get(oppositeLabel);
-
-                if (CollectionUtils.isEmpty(existingRel)) {
-                    Set<SimplePersonDTO> set = new HashSet<>();
-                    set.add(main);
-                    otherRels.put(oppositeLabel, set);
-                } else { //there is an existing list of people so just add main to the list
-                    existingRel.add(main);
-                }
-
-                //convert the map back to list
-                List<RelationshipDTO> newList = otherRels.entrySet().stream()
-                        .map(e -> new RelationshipDTO(e.getKey(), e.getValue()))
-                        .collect(toList());
-
-                other.setRelationships(newList);
-
-                peopleService.createPerson(other);
-
-            }
-
-        }
+       peopleService.addMainInOppositeRelationship(main, p.getRelationships());
+       peopleService.addMainAsChild(main, p.getParents());
 
 
         return dto;

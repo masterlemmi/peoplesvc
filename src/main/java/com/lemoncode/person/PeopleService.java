@@ -3,9 +3,11 @@ package com.lemoncode.person;
 
 import com.lemoncode.file.FilesStorageService;
 import com.lemoncode.relationship.Relations;
+import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -18,8 +20,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 
 @Service
 class PeopleService {
@@ -160,4 +161,62 @@ class PeopleService {
         return repository.save(people).stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
 
     }
+
+    public void addMainInOppositeRelationship(SimplePersonDTO main, List<RelationshipDTO> relationships) {
+        for (RelationshipDTO reldto : relationships) {
+            String label = reldto.getLabel().toUpperCase();
+
+            if (!labelService.isSupportedLabel(label))
+                continue;
+
+            String oppositeLabel = labelService.getOppositeLabel(label, GenderEnum.from(main.getGender()));
+            Set<SimplePersonDTO> people = reldto.getPeople();
+
+            for (SimplePersonDTO simpleDTO : people) {
+                PersonDTO other = this.findOne(simpleDTO.getId());
+
+                Map<String, Set<SimplePersonDTO>> otherRels = other.getRelationships()
+                        .stream().collect(toMap(rel -> rel.getLabel().toUpperCase(), RelationshipDTO::getPeople));
+
+                Set<SimplePersonDTO> existingRel = otherRels.get(oppositeLabel);
+
+                if (CollectionUtils.isEmpty(existingRel)) {
+                    Set<SimplePersonDTO> set = new HashSet<>();
+                    set.add(main);
+                    otherRels.put(oppositeLabel, set);
+                } else { //there is an existing list of people so just add main to the list
+                    existingRel.add(main);
+                }
+
+                //convert the map back to list
+                List<RelationshipDTO> newList = otherRels.entrySet().stream()
+                        .map(e -> new RelationshipDTO(e.getKey(), e.getValue()))
+                        .collect(toList());
+
+                other.setRelationships(newList);
+
+                this.createPerson(other);
+
+            }
+
+        }
+    }
+
+    public void addMainAsChild(SimplePersonDTO main, Set<SimplePersonDTO> parents) {
+
+        for (SimplePersonDTO parent : parents) {
+            PersonDTO other = this.findOne(parent.getId());
+            Set<SimplePersonDTO> otherChildren = other.getChildren();
+
+            boolean alreadyAdded = otherChildren.stream().anyMatch(x -> x.getId() == main.getId());
+
+            if (alreadyAdded)
+               continue;
+            otherChildren.add(main);
+            this.createPerson(other);
+        }
+
+    }
+
+
 }
