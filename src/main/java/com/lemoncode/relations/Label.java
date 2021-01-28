@@ -38,8 +38,8 @@ public enum Label {
     private static final List<String> THIRD_COUSINS = Arrays.asList(CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF); //TODO:
     private static final List<String> TITO_TITA_1 = Arrays.asList(CHILD_OF, SIBLING_OF);
     private static final List<String> TITO_TITA_2 = Arrays.asList(CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF);
-    private static final List<String> LOLO_LOLA_L = Arrays.asList(CHILD_OF, CHILD_OF);
-    private static final List<String> LOLO_LOLA_L = Arrays.asList(CHILD_OF, CHILD_OF);
+    private static final List<String> LOLO_LOLA_1 = Arrays.asList(CHILD_OF, CHILD_OF);
+    private static final List<String> LOLO_LOLA_2 = Arrays.asList(CHILD_OF, CHILD_OF);
 
     public static Label from(List<ConnectionsDTO.Edge> links) {
         List<String> list = links.stream().map(ConnectionsDTO.Edge::getLabel).collect(toList());
@@ -52,7 +52,7 @@ public enum Label {
             return Label.COUSIN_3RD;
         } else if (list.equals(TITO_TITA_1) || list.equals(TITO_TITA_2)) {
             return Label.TITO_TITA;
-        } else if (list.equals(LOLO_LOLA_L)) {
+        } else if (list.equals(LOLO_LOLA_1)) {
             return Label.LOLO_LOLA;
         } else {
             return UNDETERMINED;
