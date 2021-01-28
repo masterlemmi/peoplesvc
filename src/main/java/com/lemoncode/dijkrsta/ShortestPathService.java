@@ -62,7 +62,7 @@ public class ShortestPathService {
                 for (SimplePersonDTO s : rel.getPeople()) {
                     Node pNode = nodeMap.get(s.getId());
                     List<String> closerLabels = Arrays.asList("WIFE", "HUSBAND");
-                    float distance = closerLabels.contains(label.toUpperCase()) ? 1.5f : 2;
+                    float distance = closerLabels.contains(label.toUpperCase()) ? 1.5f : 3;
                     mainNode.addDestination(pNode, distance);
                 }
             }

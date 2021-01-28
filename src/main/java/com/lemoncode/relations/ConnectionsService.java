@@ -45,11 +45,12 @@ public class ConnectionsService {
             shortestPath = Arrays.stream(dbShortestPath.split(",")).map(Long::parseLong).collect(Collectors.toList());
         }
 
-        return doit(shortestPath, targetId);
+        return doit(shortestPath, target);
 
     }
 
-    private ConnectionsDTO doit(List<Long> shortestPath, Long targetId) {
+    private ConnectionsDTO doit(List<Long> shortestPath, Person target) {
+        Long targetId = target.getId();
         List<ConnectionsDTO.Node> nodes = new ArrayList<>();
         List<ConnectionsDTO.Edge> links = new ArrayList<>();
 
@@ -94,7 +95,7 @@ public class ConnectionsService {
         ConnectionsDTO connectionsDTO = new ConnectionsDTO();
         connectionsDTO.setNodes(nodes);
         connectionsDTO.setLinks(links);
-        connectionsDTO.setRelationLabel(""); //TODO: ideentify label based from links
+        connectionsDTO.setRelationLabel(Label.from(links).byGender(target.getGender()));
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
 
         return connectionsDTO;
