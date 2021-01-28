@@ -105,11 +105,6 @@ public class ConnectionsRepository {
 
 
     public int deleteAll() {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        // create delete
-        CriteriaDelete<Connections> delete = cb.createCriteriaDelete(Connections.class);
-        // set the root class
-        // perform update
-        return this.entityManager.createQuery(delete).executeUpdate();
+        return this.entityManager.createQuery("DELETE FROM PEOPLE_CONNECTIONS").executeUpdate();
     }
 }
