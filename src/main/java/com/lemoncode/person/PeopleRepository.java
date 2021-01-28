@@ -33,6 +33,27 @@ public class PeopleRepository {
                 .getResultList();
     }
 
+
+    public List<Person> findAllJoined() {
+        this.entityManager.clear();
+        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        // create query
+        CriteriaQuery<Person> q = cb.createQuery(Person.class);
+        // set the root class
+        Root<Person> root = q.from(Person.class);
+        //perform query
+//        q.orderBy(cb.desc(root.get(Person_.hasUpdate)), cb.asc(root.get(Person_.title)));
+
+
+        EntityGraph<Person> entityGraph = entityManager.createEntityGraph(Person.class);
+        entityGraph.addAttributeNodes("children");
+        entityGraph.addAttributeNodes("relationships");
+
+
+        return this.entityManager.createQuery(q)  .setHint("javax.persistence.fetchgraph", entityGraph)
+                .getResultList();
+    }
+
     public List<Person> findSome() {
         this.entityManager.clear();
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -174,6 +195,29 @@ public class PeopleRepository {
             //perform query
             return this.entityManager.createQuery(query)
                     .setHint("javax.persistence.fetchgraph", entityGraph)
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Person findByIdNoJoins(long id) {
+        try {
+            this.entityManager.clear();
+
+            CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+            // create query
+            CriteriaQuery<Person> query = cb.createQuery(Person.class);
+            // set the root class
+
+
+
+            Root<Person> root = query.from(Person.class);
+
+            query.where(cb.equal(root.get(Person_.id), id));
+            //perform query
+            return this.entityManager.createQuery(query)
                     .getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();

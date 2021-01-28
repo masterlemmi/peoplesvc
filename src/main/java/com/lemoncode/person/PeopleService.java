@@ -2,6 +2,7 @@ package com.lemoncode.person;
 
 
 import com.lemoncode.file.FilesStorageService;
+import com.lemoncode.relations.ConnectionsService;
 import com.lemoncode.relationship.Relations;
 import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -13,17 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
 @Service
-class PeopleService {
+public class PeopleService {
     private final static Logger LOGGER = Logger.getLogger(PeopleService.class.getName());
     @Autowired
     PeopleRepository repository;
@@ -37,18 +35,30 @@ class PeopleService {
     @Autowired
     RelationshipLabelService labelService;
 
-    List<SimplePersonDTO> findAll() {
+    @Autowired
+    ConnectionsService connectionsService;
+
+    List<SimplePersonDTO> findAllSimple() {
         return repository.findAll().stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
     }
 
-    List<SimplePersonDTO> findAll(Set<Long> excludeIds) {
+    List<SimplePersonDTO> findAllSimple(Set<Long> excludeIds) {
         return repository.findAll()
                 .stream().filter(p -> !excludeIds.contains(p.getId())).map(mapper::toSimplePersonDTO).collect(toList());
-
     }
 
     @Transactional
-    PersonDTO findOne(Long id) {
+    public List<PersonDTO> findAll() {
+        List<Person> people = repository.findAllJoined();
+        List<PersonDTO> dtos = new ArrayList<>();
+        for (Person person : people) {
+            dtos.add(findOne(person.getId()));
+        }
+        return dtos;
+    }
+
+    @Transactional
+   public PersonDTO findOne(Long id) {
         Person person = repository.findById(id);
         PersonDTO dto = mapper.toPersonDTO(person);
 
@@ -100,7 +110,7 @@ class PeopleService {
     }
 
     List<SimplePersonDTO> getRecent() {
-        //TODO: save recents and return
+        //TODO: findConnection recents and return
         return getSample();
     }
 
@@ -110,9 +120,14 @@ class PeopleService {
         person.setFirstName(p.getFirstName());
         person.setLastName(p.getLastName());
         person.setGender(p.getGender().startsWith("M") ? GenderEnum.MALE : GenderEnum.FEMALE);
+
+
         Person saved = this.repository.save(person);
         p.setId(saved.getId());
         p.setFullName(p.getFirstName() + " " + p.getLastName());
+
+        connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
+
         return p;
     }
 
@@ -152,13 +167,18 @@ class PeopleService {
         }
 
         Person saved = repository.save(person);
+        connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
         p.setId(saved.getId());
         return p;
     }
 
     public List<SimplePersonDTO> save(List<Person> people) {
 
-        return repository.save(people).stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
+        List<SimplePersonDTO> createdList =  repository.save(people).stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
+
+        connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
+
+        return createdList;
 
     }
 
@@ -211,7 +231,7 @@ class PeopleService {
             boolean alreadyAdded = otherChildren.stream().anyMatch(x -> x.getId() == main.getId());
 
             if (alreadyAdded)
-               continue;
+                continue;
             otherChildren.add(main);
             this.createPerson(other);
         }

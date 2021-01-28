@@ -75,7 +75,7 @@ public class PeopleResource {
             return dto;
         }
 
-        //  // create opposite associates from the relations defined
+        //  // create opposite associates from the Connections defined
         //    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
         //    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender
         SimplePersonDTO main = this.mapper.toSimplePersonDTO(dto);
@@ -100,9 +100,9 @@ public class PeopleResource {
         } else {
             if (excludeIds != null && !excludeIds.trim().isEmpty()) {
                 Set<Long> exclude = Arrays.stream(excludeIds.split(",")).map(Long::parseLong).collect(toSet());
-                return peopleService.findAll(exclude);
+                return peopleService.findAllSimple(exclude);
             } else {
-                return peopleService.findAll();
+                return peopleService.findAllSimple();
             }
         }
 
@@ -139,13 +139,6 @@ public class PeopleResource {
         return peopleService.findOne(id);
     }
 
-//    @GetMapping("/{id}/relations")
-//    public List<RelationshipDTO> findPeopleWithRelationshipsAs(@PathVariable("id") int id, @RequestParam(value = "label", required = false) String label) {
-//        if (label == null) {
-//            return relService.getRelationships(id);
-//        }
-//        return List.of(relService.getRelationships(id, label));
-//    }
 
     @GetMapping(
             value = "/image/{fileName}",
@@ -167,5 +160,8 @@ public class PeopleResource {
     public Set<String> getLabels() {
         return labelService.getLabelsSet();
     }
+
+
+
 
 }

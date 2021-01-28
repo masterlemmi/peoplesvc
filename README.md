@@ -29,3 +29,7 @@ docker run -p8081:8081 peoplesvc
 
 
 ### TODO
+1. load resource list only/ health later
+2. TeroyReviewer
+3. Chichi Tutorial
+4. Tree - How one person is connected/related to other
