@@ -85,7 +85,7 @@ public class PeopleService {
         Set<Person> parents = new HashSet<>(repository.findParents(id));
 
         return repository.findChildren(parents).stream()
-                .filter(sib -> sib.getId() != id) //remove self from children
+                .filter(sib -> !sib.getId().equals(id)) //remove self from children
                 .map(mapper::toSimplePersonDTO).collect(Collectors.toSet());
     }
 
