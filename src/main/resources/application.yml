@@ -18,7 +18,7 @@ spring:
           issuer-uri: http://localhost:8083/auth/realms/baeldung
           jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/xepdb1
+    url: jdbc:oracle:thin:@localhost:1521/orclpdb1
     username: lem_stage
     password: lem_stage
     hikari:
@@ -50,8 +50,8 @@ relationshipLabels:
   - barkada
   - partner
 
-#logging:
-#  level:
-#    org:
-#      springframework:
-#        security: DEBUG
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

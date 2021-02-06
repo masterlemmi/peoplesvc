@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,7 +79,7 @@ public class ConnectionsService {
             edge.setLabel(whoIsCurrentToNext(currId, next));
             links.add(edge);
 
-            if (i == shortestPath.size() -1){
+            if (i == shortestPath.size() - 1) {
                 //last iteration create the targetNode
                 ConnectionsDTO.Node targetNode = new ConnectionsDTO.Node();
                 targetNode.setId(nextId);
@@ -133,18 +131,34 @@ public class ConnectionsService {
 
     @Transactional
     public void deleteAll() {
-      int deleted =  connectionsRepository.deleteAll();
+        int deleted = connectionsRepository.deleteAll();
         System.out.println("Deleted " + deleted + " rows");
     }
 
+    Map<Long, ConnectionsDTO> fakeCache = new HashMap<>();
+
     //only Families wife/husband/parents/children/
     public ConnectionsDTO findConnection(Long source) {
+
+        //TODO: temp.lem muna for now
+        SimplePersonDTO lem = peopleService.search("lem", new HashSet<>()).stream()
+                .filter(x -> x.getLastName().toLowerCase().contains("taeza")).findAny().get();
+
+        ConnectionsDTO cached = fakeCache.get(lem.getId());
+        if (cached != null) return cached;
+
         FamilyTreeMaker familyTreeMaker = new FamilyTreeMaker(peopleService);
-        familyTreeMaker.generate(source);
+        familyTreeMaker.generate(lem.getId());
         ConnectionsDTO connectionsDTO = new ConnectionsDTO();
         connectionsDTO.setNodes(familyTreeMaker.getNodes());
         connectionsDTO.setLinks(familyTreeMaker.getLinks());
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
+
+        fakeCache.put(lem.getId(), cached);
         return connectionsDTO;
+    }
+
+    public void clearFakeCache(){
+        this.fakeCache.clear();
     }
 }

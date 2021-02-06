@@ -1,4 +1,4 @@
- alter session set container = XEPDB1;
+ alter session set container = ORCLPDB1;
 CREATE USER lem_stage IDENTIFIED BY lem_stage;
 GRANT CONNECT TO lem_stage;
 GRANT CONNECT, RESOURCE, DBA TO lem_stage;

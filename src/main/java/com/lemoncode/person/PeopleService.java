@@ -105,7 +105,7 @@ public class PeopleService {
         return search(query, new HashSet<>());
     }
 
-    List<SimplePersonDTO> search(String query, Set<Long> excludeIds) {
+    public List<SimplePersonDTO> search(String query, Set<Long> excludeIds) {
         return repository.search(query).stream().filter(p -> !excludeIds.contains(p.getId())).map(mapper::toSimplePersonDTO).collect(toList());
     }
 
@@ -168,6 +168,7 @@ public class PeopleService {
 
         Person saved = repository.save(person);
         connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
+        connectionsService.clearFakeCache();
         p.setId(saved.getId());
         return p;
     }
