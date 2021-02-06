@@ -14,11 +14,15 @@ public class ConnectionsResource {
     @Autowired
     ConnectionsService connectionsService;
 
+    @GetMapping("/family-tree/{source}")
+    public ConnectionsDTO generateFamilyTree(@PathVariable("source") Long source){
+        return connectionsService.findConnection(source);
+    }
 
-    @GetMapping("/{source}/{target}")
-    public ConnectionsDTO test(@PathVariable("source") Long source, @PathVariable("target") Long target){
+
+    @GetMapping("/between/{source}/{target}")
+    public ConnectionsDTO getRelationnshipBetweenTwo(@PathVariable("source") Long source, @PathVariable("target") Long target){
         return connectionsService.findConnection(source, target);
-
     }
 
 }

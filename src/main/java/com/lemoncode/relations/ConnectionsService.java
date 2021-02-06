@@ -1,6 +1,7 @@
 package com.lemoncode.relations;
 
 import com.lemoncode.dijkrsta.ShortestPathService;
+import com.lemoncode.familytree.FamilyTreeMaker;
 import com.lemoncode.person.*;
 import com.lemoncode.relationship.RelationshipDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,6 +137,14 @@ public class ConnectionsService {
         System.out.println("Deleted " + deleted + " rows");
     }
 
-
-
+    //only Families wife/husband/parents/children/
+    public ConnectionsDTO findConnection(Long source) {
+        FamilyTreeMaker familyTreeMaker = new FamilyTreeMaker(peopleService);
+        familyTreeMaker.generate(source);
+        ConnectionsDTO connectionsDTO = new ConnectionsDTO();
+        connectionsDTO.setNodes(familyTreeMaker.getNodes());
+        connectionsDTO.setLinks(familyTreeMaker.getLinks());
+        connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
+        return connectionsDTO;
+    }
 }

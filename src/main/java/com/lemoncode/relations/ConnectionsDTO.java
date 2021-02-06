@@ -1,9 +1,6 @@
 package com.lemoncode.relations;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -28,6 +25,7 @@ public class ConnectionsDTO {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode
     public static class Node {
         private String id;
         private String label;
@@ -57,7 +55,7 @@ public class ConnectionsDTO {
         }
 
         public void setId(int id){
-            String s = Character.toString((char) (97 +id));
+        //    String s = Character.toString((char) (97 +id));
             this.id = "a" + id;
         }
 
