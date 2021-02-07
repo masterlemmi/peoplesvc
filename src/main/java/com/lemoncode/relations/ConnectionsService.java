@@ -140,22 +140,19 @@ public class ConnectionsService {
     //only Families wife/husband/parents/children/
     public ConnectionsDTO findConnection(Long source) {
 
-        //TODO: temp.lem muna for now
-        SimplePersonDTO lem = peopleService.search("lem", new HashSet<>()).stream()
-                .filter(x -> x.getLastName().toLowerCase().contains("taeza")).findAny().get();
-
-        ConnectionsDTO cached = fakeCache.get(lem.getId());
+        ConnectionsDTO cached = fakeCache.get(source);
         if (cached != null) return cached;
 
         FamilyTreeMaker familyTreeMaker = new FamilyTreeMaker(peopleService);
-        familyTreeMaker.generate(lem.getId());
+        familyTreeMaker.start(source);
         ConnectionsDTO connectionsDTO = new ConnectionsDTO();
         connectionsDTO.setNodes(familyTreeMaker.getNodes());
         connectionsDTO.setLinks(familyTreeMaker.getLinks());
         connectionsDTO.setClusters(familyTreeMaker.getClusters());
+        connectionsDTO.setRelationLabel(familyTreeMaker.getTreeLabel());
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
 
-        fakeCache.put(lem.getId(), cached);
+        fakeCache.put(source, connectionsDTO);
         return connectionsDTO;
     }
 

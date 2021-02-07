@@ -14,7 +14,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.toSet;
 
 
-public class FamilyTreeMaker {
+public class FamilyTreeMakerAll {
 
     PeopleService peopleService;
     //Map<Long, ConnectionsDTO.Node> nodeMap = new HashMap<>();
@@ -22,54 +22,43 @@ public class FamilyTreeMaker {
     List<ConnectionsDTO.Edge> links = new ArrayList<>();
     Set<ConnectionsDTO.Node> nodes = new HashSet<>();
     List<ConnectionsDTO.Cluster> clusters = new ArrayList<>();
-    String treeLabel = "";
 
     int edgeIndex = 0;
 
-    public FamilyTreeMaker(PeopleService peopleService) {
+    public FamilyTreeMakerAll(PeopleService peopleService) {
         this.peopleService = peopleService;
     }
 
-    public void start(Long id){
+
+    public void generate(Long id) {
+
+        if (doneList.contains(id)) return;
+
         PersonDTO main = peopleService.findOne(id);
-        this.treeLabel = main.getFullName() + " Family Tree";
-        generate(main);
-    }
-
-
-    private void generate(PersonDTO main) {
-
-        if (doneList.contains(main.getId())) return;
-        doneList.add(main.getId());
         nodes.add(toNode(main));
-
+        List<Long> toIterate = new ArrayList<>();
         Set<SimplePersonDTO> parents = main.getParents();
-
         for (SimplePersonDTO parent : parents) {
             nodes.add(toNode(parent));
             links.add(toEdge(main.getId(), parent.getId(), "is child of"));
-            PersonDTO person = peopleService.findOne(parent.getId());
-            generate(person);
+            toIterate.add(parent.getId());
         }
-
         Set<SimplePersonDTO> children = main.getChildren();
         for (SimplePersonDTO child : children) {
             nodes.add(toNode(child));
             links.add(toEdge(child.getId(), main.getId(), "is child of"));
-            PersonDTO person = peopleService.findOne(child.getId());
-            generate(person);
+            toIterate.add(child.getId());
         }
         Set<SimplePersonDTO> asawas = main.getRelationships().stream().filter(rel ->
                 rel.getLabel().equalsIgnoreCase("wife")
                         || rel.getLabel().equalsIgnoreCase("husband")
         ).flatMap(x -> x.getPeople().stream()).collect(toSet());
-
         for (SimplePersonDTO asawa : asawas) {
             nodes.add(toNode(asawa));
             links.add(toEdge(main.getId(), asawa.getId(), " -- "));
+            toIterate.add(asawa.getId());
         }
 
-        //group siblings
         if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(main.getSiblings())) {
             ConnectionsDTO.Cluster c = new ConnectionsDTO.Cluster();
             Set<SimplePersonDTO> sibs = main.getSiblings();
@@ -85,12 +74,11 @@ public class FamilyTreeMaker {
             this.clusters.add(c);
         }
 
+        doneList.add(main.getId());
 
+        toIterate.forEach(this::generate);
 
     }
-
-
-
 
     public ConnectionsDTO.Edge toEdge(Long currId, Long nextId, String label) {
         ConnectionsDTO.Edge edge = new ConnectionsDTO.Edge();
@@ -125,10 +113,6 @@ public class FamilyTreeMaker {
 
     public List<ConnectionsDTO.Cluster> getClusters() {
         return this.clusters;
-    }
-
-    public String getTreeLabel(){
-        return this.treeLabel;
     }
 
     private boolean alreadyInExistingCluster(Long l) {

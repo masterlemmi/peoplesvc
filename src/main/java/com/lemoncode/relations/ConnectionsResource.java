@@ -19,7 +19,6 @@ public class ConnectionsResource {
         return connectionsService.findConnection(source);
     }
 
-
     @GetMapping("/between/{source}/{target}")
     public ConnectionsDTO getRelationnshipBetweenTwo(@PathVariable("source") Long source, @PathVariable("target") Long target){
         return connectionsService.findConnection(source, target);
