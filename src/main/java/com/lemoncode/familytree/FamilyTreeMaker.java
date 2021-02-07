@@ -71,21 +71,21 @@ public class FamilyTreeMaker {
 //            links.add(toEdge(main.getId(), asawa.getId(), " -- "));
 //        }
 
-//        //group siblings
-//        if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(main.getSiblings())) {
-//            ConnectionsDTO.Cluster c = new ConnectionsDTO.Cluster();
-//            Set<SimplePersonDTO> sibs = main.getSiblings();
-//            StringBuilder label = new StringBuilder();
-//            for (SimplePersonDTO s : sibs) {
-//                c.addChild(s.getId().toString());
-//                label.append(s.getId());
-//            }
-//            c.addChild(main.getId().toString());
-//            label.append(main.getId().toString());
-//            c.setLabel(label.toString());
-//            c.setId(label.toString());
-//            this.clusters.add(c);
-//        }
+        //group siblings
+        if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(main.getSiblings())) {
+            ConnectionsDTO.Cluster c = new ConnectionsDTO.Cluster();
+            Set<SimplePersonDTO> sibs = main.getSiblings();
+            StringBuilder label = new StringBuilder();
+            for (SimplePersonDTO s : sibs) {
+                c.addChild(s.getId().toString());
+                label.append(s.getId());
+            }
+            c.addChild(main.getId().toString());
+            label.append(main.getId().toString());
+            c.setLabel(label.toString());
+            c.setId(label.toString());
+            this.clusters.add(c);
+        }
 
         //group couples
 //
