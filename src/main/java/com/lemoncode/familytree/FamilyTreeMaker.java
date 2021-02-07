@@ -33,11 +33,11 @@ public class FamilyTreeMaker {
     public void start(Long id){
         PersonDTO main = peopleService.findOne(id);
         this.treeLabel = main.getFullName() + " Family Tree";
-        generate(main);
+        generate(main, false);
     }
 
 
-    private void generate(PersonDTO main) {
+    private void generate(PersonDTO main, boolean skipParents) {
 
         if (doneList.contains(main.getId())) return;
         doneList.add(main.getId());
@@ -45,11 +45,13 @@ public class FamilyTreeMaker {
 
         Set<SimplePersonDTO> parents = main.getParents();
 
-        for (SimplePersonDTO parent : parents) {
-            nodes.add(toNode(parent));
-            links.add(toEdge(main.getId(), parent.getId(), "is child of"));
-            PersonDTO person = peopleService.findOne(parent.getId());
-            generate(person);
+        if (!skipParents) {
+            for (SimplePersonDTO parent : parents) {
+                nodes.add(toNode(parent));
+                links.add(toEdge(main.getId(), parent.getId(), "is child of"));
+                PersonDTO person = peopleService.findOne(parent.getId());
+                generate(person, false);
+            }
         }
 
         Set<SimplePersonDTO> children = main.getChildren();
@@ -57,7 +59,7 @@ public class FamilyTreeMaker {
             nodes.add(toNode(child));
             links.add(toEdge(child.getId(), main.getId(), "is child of"));
             PersonDTO person = peopleService.findOne(child.getId());
-            generate(person);
+            generate(person, true);
         }
         Set<SimplePersonDTO> asawas = main.getRelationships().stream().filter(rel ->
                 rel.getLabel().equalsIgnoreCase("wife")
