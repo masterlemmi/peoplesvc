@@ -61,15 +61,15 @@ public class FamilyTreeMaker {
             PersonDTO person = peopleService.findOne(child.getId());
             generate(person, true);
         }
-        Set<SimplePersonDTO> asawas = main.getRelationships().stream().filter(rel ->
-                rel.getLabel().equalsIgnoreCase("wife")
-                        || rel.getLabel().equalsIgnoreCase("husband")
-        ).flatMap(x -> x.getPeople().stream()).collect(toSet());
-
-        for (SimplePersonDTO asawa : asawas) {
-            nodes.add(toNode(asawa));
-            links.add(toEdge(main.getId(), asawa.getId(), " -- "));
-        }
+//        Set<SimplePersonDTO> asawas = main.getRelationships().stream().filter(rel ->
+//                rel.getLabel().equalsIgnoreCase("wife")
+//                        || rel.getLabel().equalsIgnoreCase("husband")
+//        ).flatMap(x -> x.getPeople().stream()).collect(toSet());
+//
+//        for (SimplePersonDTO asawa : asawas) {
+//            nodes.add(toNode(asawa));
+//            links.add(toEdge(main.getId(), asawa.getId(), " -- "));
+//        }
 
 //        //group siblings
 //        if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(main.getSiblings())) {
@@ -88,21 +88,21 @@ public class FamilyTreeMaker {
 //        }
 
         //group couples
-        //        //group siblings
-        if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(asawas)) {
-            ConnectionsDTO.Cluster c = new ConnectionsDTO.Cluster();
-
-            StringBuilder label = new StringBuilder();
-            for (SimplePersonDTO s : asawas) {
-                c.addChild(s.getId().toString());
-                label.append(s.getId());
-            }
-            c.addChild(main.getId().toString());
-            label.append(main.getId().toString());
-            c.setLabel(label.toString());
-            c.setId(label.toString());
-            this.clusters.add(c);
-        }
+//
+//        if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(asawas)) {
+//            ConnectionsDTO.Cluster c = new ConnectionsDTO.Cluster();
+//
+//            StringBuilder label = new StringBuilder();
+//            for (SimplePersonDTO s : asawas) {
+//                c.addChild(s.getId().toString());
+//                label.append(s.getId());
+//            }
+//            c.addChild(main.getId().toString());
+//            label.append(main.getId().toString());
+//            c.setLabel(label.toString());
+//            c.setId(label.toString());
+//            this.clusters.add(c);
+//        }
 
 
 
