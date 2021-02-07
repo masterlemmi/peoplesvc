@@ -68,7 +68,7 @@ public class FamilyTreeMaker {
                 label.append(s.getId());
             }
             c.addChild(main.getId().toString());
-            label.append(main.getId().toString())
+            label.append(main.getId().toString());
             c.setLabel(label.toString());
             c.setId(label.toString());
             this.clusters.add(c);
