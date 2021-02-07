@@ -152,6 +152,7 @@ public class ConnectionsService {
         ConnectionsDTO connectionsDTO = new ConnectionsDTO();
         connectionsDTO.setNodes(familyTreeMaker.getNodes());
         connectionsDTO.setLinks(familyTreeMaker.getLinks());
+        connectionsDTO.setClusters(familyTreeMaker.getClusters());
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
 
         fakeCache.put(lem.getId(), cached);

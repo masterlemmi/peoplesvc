@@ -2,6 +2,7 @@ package com.lemoncode.relations;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -11,6 +12,7 @@ public class ConnectionsDTO {
     private String status;
     private List<Node> nodes;
     private List<Edge> links;
+    private List<Cluster> clusters;
     private String relationLabel;
 
     public static ConnectionsDTO noLink() {
@@ -57,6 +59,21 @@ public class ConnectionsDTO {
         public void setId(int id){
         //    String s = Character.toString((char) (97 +id));
             this.id = "a" + id;
+        }
+
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Cluster {
+        private String id;
+        private String label;
+        private List<String> childNodeIds = new ArrayList<>();
+
+        public void addChild(String c){
+            this.childNodeIds.add(c);
         }
 
     }

@@ -4,6 +4,7 @@ import com.lemoncode.person.PeopleService;
 import com.lemoncode.person.PersonDTO;
 import com.lemoncode.person.SimplePersonDTO;
 import com.lemoncode.relations.ConnectionsDTO;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ public class FamilyTreeMaker {
     List<Long> doneList = new ArrayList<>();
     List<ConnectionsDTO.Edge> links = new ArrayList<>();
     Set<ConnectionsDTO.Node> nodes = new HashSet<>();
+    List<ConnectionsDTO.Cluster> clusters = new ArrayList<>();
 
     int edgeIndex = 0;
 
@@ -49,12 +51,27 @@ public class FamilyTreeMaker {
         }
         Set<SimplePersonDTO> asawas = main.getRelationships().stream().filter(rel ->
                 rel.getLabel().equalsIgnoreCase("wife")
-                || rel.getLabel().equalsIgnoreCase("husband")
+                        || rel.getLabel().equalsIgnoreCase("husband")
         ).flatMap(x -> x.getPeople().stream()).collect(toSet());
         for (SimplePersonDTO asawa : asawas) {
             nodes.add(toNode(asawa));
             links.add(toEdge(main.getId(), asawa.getId(), " -- "));
             toIterate.add(asawa.getId());
+        }
+
+        if (!alreadyInExistingCluster(main.getId()) && !CollectionUtils.isEmpty(main.getSiblings())) {
+            ConnectionsDTO.Cluster c = new ConnectionsDTO.Cluster();
+            Set<SimplePersonDTO> sibs = main.getSiblings();
+            StringBuilder label = new StringBuilder();
+            for (SimplePersonDTO s : sibs) {
+                c.addChild(s.getId().toString());
+                label.append(s.getId());
+            }
+            c.addChild(main.getId().toString());
+            label.append(main.getId().toString())
+            c.setLabel(label.toString());
+            c.setId(label.toString());
+            this.clusters.add(c);
         }
 
         doneList.add(main.getId());
@@ -94,5 +111,14 @@ public class FamilyTreeMaker {
         return this.links;
     }
 
+    public List<ConnectionsDTO.Cluster> getClusters() {
+        return this.clusters;
+    }
 
+    private boolean alreadyInExistingCluster(Long l) {
+        return this.clusters.stream()
+                .flatMap(x -> x.getChildNodeIds().stream())
+                .anyMatch(s -> s.equalsIgnoreCase(l.toString()));
+
+    }
 }
