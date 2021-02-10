@@ -29,7 +29,7 @@ public abstract class PersonMapper {
     @Mapping(target = "fullName", expression = "java(person.getFirstName() + \" \" + person.getLastName() )")
     @Mapping(target = "age", expression = "java(computeAge(person.getDateOfBirth()))")
     @Mapping(target = "deceased", expression = "java(person.getDateOfDeath() !=  null)")
-    @Mapping(target = "notes", expression = "java(person.getNotes() == null?  \"\" : person.getNotes().replaceAll(\"\\n\", \"<br/>\"))")
+    @Mapping(target = "notes", expression = "java(person.getNotes() == null?  \"\" : person.getNotes())")
     public abstract PersonDTO toPersonDTO(Person person);
 
     @AfterMapping
