@@ -32,6 +32,7 @@ public class Person {
     private String address;
     private String photo;
     private String email;
+    @Column(length = 4000)
     private String notes;
     @Enumerated(EnumType.STRING)
     @EqualsAndHashCode.Include
