@@ -29,9 +29,11 @@ public class Person {
     @Column(nullable = false)
     private String lastName;
     private String nickname;
+    private String maidenName; //required for female to track ancestry
     private String address;
     private String photo;
     private String email;
+    private Boolean adopted;
     @Column(length = 4000)
     private String notes;
     @Enumerated(EnumType.STRING)

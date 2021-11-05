@@ -26,6 +26,7 @@ public class PersonDTO {
     private String lastName;
     private String nickname;
     private String fullName;
+    private String maidenName;
     private String initials;
     private String photo;
     private String photoUrl;
@@ -33,6 +34,7 @@ public class PersonDTO {
     private String address;
     private Integer age;
     private boolean deceased;
+    private Boolean adopted;
     @EqualsAndHashCode.Include
     private @NonNull String gender;
     @EqualsAndHashCode.Include

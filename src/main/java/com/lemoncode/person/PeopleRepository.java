@@ -249,4 +249,29 @@ public class PeopleRepository {
         }
     }
 
+    public Person findByDescendantsByAncestorId(Long id) {
+        try {
+            this.entityManager.clear();
+
+            CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+            // create query
+            CriteriaQuery<Person> query = cb.createQuery(Person.class);
+            // set the root class
+
+            EntityGraph<Person> entityGraph = entityManager.createEntityGraph(Person.class);
+            entityGraph.addAttributeNodes("children");
+
+
+            Root<Person> root = query.from(Person.class);
+
+            query.where(cb.equal(root.get(Person_.id), id));
+            //perform query
+            return this.entityManager.createQuery(query)
+                    .setHint("javax.persistence.fetchgraph", entityGraph)
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

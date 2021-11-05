@@ -35,7 +35,7 @@ spring:
     generate-ddl: true
     hibernate:
       use-new-id-generator-mappings: false
-      ddl-auto: validate
+      ddl-auto: update
 relationshipLabels:
   #key, value(M), value(F)
   - wife,husband,wife

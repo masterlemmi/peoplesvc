@@ -86,6 +86,21 @@ public class PeopleResource {
         return dto;
     }
 
+    @PostMapping("/{id}/image")
+    public ResponseEntity<ResponseMessage> saveImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
+        String message = "";
+        try {
+            String name = peopleService.savePhoto(id, file);
+            message = "Uploaded the file successfully: " + file.getOriginalFilename();
+            ResponseMessage<String> res = new ResponseMessage<>(message);
+            res.setData(name);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
+        }
+    }
 
     @GetMapping
     public List<SimplePersonDTO> find(@RequestParam(value = "q", required = false) String query, @RequestParam(value = "exclude", required = false) String excludeIds) {
@@ -113,21 +128,7 @@ public class PeopleResource {
         return peopleService.getRecent();
     }
 
-    @PostMapping("/{id}/image")
-    public ResponseEntity<ResponseMessage> saveImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
-        String message = "";
-        try {
-            String name = peopleService.savePhoto(id, file);
-            message = "Uploaded the file successfully: " + file.getOriginalFilename();
-            ResponseMessage<String> res = new ResponseMessage<>(message);
-            res.setData(name);
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        } catch (Exception e) {
-            e.printStackTrace();
-            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
-        }
-    }
+
 
     @GetMapping("/simple/{id}")
     public SimplePersonDTO findSimpleById(@PathVariable("id") int id) {
