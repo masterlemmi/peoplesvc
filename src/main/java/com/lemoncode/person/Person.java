@@ -1,5 +1,6 @@
 package com.lemoncode.person;
 
+import com.lemoncode.descendants.Ancestry;
 import com.lemoncode.relationship.Relations;
 import lombok.*;
 
@@ -34,6 +35,10 @@ public class Person {
     private String photo;
     private String email;
     private Boolean adopted;
+
+    @OneToOne(mappedBy = "ancestor", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Ancestry ancestry;
+
     @Column(length = 4000)
     private String notes;
     @Enumerated(EnumType.STRING)
@@ -100,5 +105,10 @@ public class Person {
         link.setPerson(null);
     }
 
+
+    @ManyToMany(mappedBy = "descendants")
+    @Setter(AccessLevel.NONE)
+    @EqualsAndHashCode.Exclude
+    private Set<Ancestry> ancestries = new HashSet<>();
 
 }

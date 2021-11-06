@@ -119,7 +119,8 @@ public abstract class PersonMapper {
 
     /* ------------------ TO ENTITIES  -------------------------*/
 
-
+    @Mapping(target = "ancestries", ignore = true)
+    @Mapping(target = "ancestry", ignore = true)
     @Mapping(target = "gender", expression = "java(GenderEnum.from(p.getGender()))")
     public abstract Person toPerson(PersonDTO p);
 

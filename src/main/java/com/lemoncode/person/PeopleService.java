@@ -1,6 +1,7 @@
 package com.lemoncode.person;
 
 
+import com.lemoncode.descendants.DescendantsService;
 import com.lemoncode.file.FilesStorageService;
 import com.lemoncode.relations.ConnectionsService;
 import com.lemoncode.relationship.Relations;
@@ -37,6 +38,9 @@ public class PeopleService {
 
     @Autowired
     ConnectionsService connectionsService;
+
+    @Autowired
+    DescendantsService descendantsService;
 
     List<SimplePersonDTO> findAllSimple() {
         return repository.findAll().stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
@@ -169,6 +173,8 @@ public class PeopleService {
         Person saved = repository.save(person);
         connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
         connectionsService.clearFakeCache();
+        descendantsService.clearFakeCache();
+        descendantsService.deleteAll();
         p.setId(saved.getId());
         return p;
     }
