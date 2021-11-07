@@ -25,6 +25,7 @@ public abstract class DescendantsMapper {
 
     @Mapping(target = "initials", ignore = true)
     @Mapping(target = "photoUrl", ignore = true)
+    @Mapping(target = "expandMe", ignore = true)
     @Mapping(target = "parents", ignore = true)
     @Mapping(target = "fullName", expression = "java(person.getFirstName() + \" \" + person.getLastName() )")
     @Mapping(target = "deceased", expression = "java(person.getDateOfDeath() !=  null)")
