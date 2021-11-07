@@ -42,6 +42,7 @@ public class PeopleService {
     @Autowired
     DescendantsService descendantsService;
 
+
     List<SimplePersonDTO> findAllSimple() {
         return repository.findAll().stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
     }
@@ -174,7 +175,7 @@ public class PeopleService {
         connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
         connectionsService.clearFakeCache();
         descendantsService.clearFakeCache();
-        descendantsService.deleteAll();
+        descendantsService.recreateDescendants();
         p.setId(saved.getId());
         return p;
     }

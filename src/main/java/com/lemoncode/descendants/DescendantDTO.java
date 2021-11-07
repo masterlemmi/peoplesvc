@@ -28,6 +28,7 @@ public class DescendantDTO {
     private String lastName;
     private String nickname;
     private String fullName;
+    private boolean expandMe; //Ui field for mat-tree use
     private String maidenName;
     private String initials;
     private String photo;

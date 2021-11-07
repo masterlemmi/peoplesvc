@@ -1,18 +1,13 @@
 package com.lemoncode.descendants;
 
-import com.lemoncode.dijkrsta.ShortestPathService;
-import com.lemoncode.familytree.FamilyTreeMaker;
-import com.lemoncode.familytree.FamilyTreeMakerSimple;
-import com.lemoncode.person.*;
-import com.lemoncode.relations.Connections;
-import com.lemoncode.relations.ConnectionsDTO;
-import com.lemoncode.relations.ConnectionsRepository;
-import com.lemoncode.relations.Label;
-import com.lemoncode.relationship.RelationshipDTO;
+import com.lemoncode.dfs.Graph;
+import com.lemoncode.person.PeopleRepository;
+import com.lemoncode.person.Person;
+import com.lemoncode.person.PersonNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -26,47 +21,22 @@ public class DescendantsService {
     PeopleRepository peopleRepository;
 
     @Autowired
-    PeopleService peopleService;
-
-    @Autowired
-    ConnectionsRepository connectionsRepository;
-
-    @Autowired
-    ShortestPathService shortestPathService;
-
-    @Autowired
     AncestryRepository ancestryRepository;
 
-    Map<Long, DescendantDTO> fakeCache = new ConcurrentHashMap<>();
-
-
-    public List<DescendantDTO> oldfindDescendants(Long origin) {
-        FamilyTreeMakerSimple familyTreeMakerSimple = new FamilyTreeMakerSimple(peopleService, peopleRepository);
-        familyTreeMakerSimple.start(origin);
-        return familyTreeMakerSimple.getDescendants();
-    }
+    Map<String, List<DescendantDTO>> fakeCache = new ConcurrentHashMap<>();
 
 
     @Transactional
-    public List<DescendantDTO> createAncestry(Long originAncestor, String ancestryName) {
+    public List<DescendantDTO> createAncestry(Long originAncestor, String ancestryNameFromReq) {
+        String ancestryName = ancestryNameFromReq.replaceAll("\\s+", "_");
         Ancestry ancestryDB = ancestryRepository.findByLabel(ancestryName);
-        if (ancestryDB != null && !ancestryDB.getId().equals(originAncestor)){
+        if (ancestryDB != null && !ancestryDB.getId().equals(originAncestor)) {
             //there is an existing ancestry with the given name. delete existign ancestry
             ancestryRepository.deleteById(ancestryDB.getId());
         }
         Person theAncestor = peopleRepository.findByDescendantsByAncestorId(originAncestor);
         if (theAncestor == null) throw new PersonNotFoundException();
         DescendantDTO dto = DescendantsMapper.INSTANCE.toDescendantDTO(theAncestor);
-
-//
-//        Ancestry ancestryFrom = ancestryRepository.findByLabel(ancestryName);
-//        if (ancestryFrom == null){
-//            ancestryFrom = new Ancestry();
-//            Person person = new Person();
-//            person.setId(theAncestor.getId());
-//            ancestryFrom.setAncestor(person);
-//            ancestryFrom.setLabel(ancestryName);
-//        }
 
         Ancestry ancestryFrom = theAncestor.getAncestry();
         if (ancestryFrom == null) {
@@ -81,7 +51,7 @@ public class DescendantsService {
 
         peopleRepository.save(theAncestor);
 
-        fakeCache.put(theAncestor.getId(), dto);
+        fakeCache.put(theAncestor.getId() + "", List.of(dto));
         return List.of(dto);
     }
 
@@ -94,25 +64,40 @@ public class DescendantsService {
         return descendants;
     }
 
-    public List<DescendantDTO> findAncestry(String label) {
+    public List<DescendantDTO> findAncestry(String label, Long descendantId) {
         Ancestry ancestryFrom = ancestryRepository.findByLabel(label);
+
         if (ancestryFrom == null) {
             throw new AncestryNotFoundException();
-        } else {
-            Long ancestorId = ancestryFrom.getId();
-            if (fakeCache.containsKey(ancestorId)) {
-                return List.of(fakeCache.get(ancestorId));
-            } else {
-                return createAncestry(ancestorId, label);
-            }
         }
 
+        if (descendantId != null){
+            //check that he is a descendant
+            ancestryFrom.getDescendants().stream().map(Person::getId).filter(id -> id.equals(descendantId)).findAny()
+                    .orElseThrow(DescendantNotFoundException::new);
+        }
+
+        String ancestorIdDescendantId = "" + ancestryFrom.getId() + (descendantId == null ? "" : String.valueOf(descendantId));
+        List<DescendantDTO> dto = fakeCache.get(ancestorIdDescendantId);
+        if (dto == null) {
+            Long ancestorId = ancestryFrom.getId();
+            List<DescendantDTO> expandedDto = setExpandValue(createAncestry(ancestorId, label), descendantId);
+            fakeCache.put(ancestorIdDescendantId, expandedDto);
+            return expandedDto;
+        }
+        return dto;
+    }
+
+    private List<DescendantDTO> setExpandValue(List<DescendantDTO> ancestry, Long descendantId) {
+        if (descendantId == null) return ancestry;
+        return List.of(Graph.findPaths(ancestry.get(0), descendantId));
     }
 
     public void clearFakeCache() {
         this.fakeCache.clear();
     }
 
+    @Transactional
     public void deleteAll() {
         int deleted = ancestryRepository.deleteAll();
         System.out.println("Deleted " + deleted + " rows");
@@ -121,4 +106,14 @@ public class DescendantsService {
     public List<String> findAncestryLabels() {
         return ancestryRepository.findAll().stream().map(Ancestry::getLabel).collect(Collectors.toList());
     }
+
+    @Async
+    public void recreateDescendants() {
+        List<Ancestry> ancestryList = ancestryRepository.findAll();
+
+        ancestryList.forEach(x ->
+                createAncestry(x.getId(), x.getLabel()
+                ));
+    }
+
 }

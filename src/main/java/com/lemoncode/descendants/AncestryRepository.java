@@ -109,6 +109,6 @@ public class AncestryRepository {
 
 
     public int deleteAll() {
-        return this.entityManager.createQuery("DELETE FROM DESCENDANTS").executeUpdate();
+        return this.entityManager.createQuery("DELETE FROM ANCESTRY").executeUpdate();
     }
 }
