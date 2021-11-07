@@ -41,6 +41,8 @@ public class Person {
 
     @Column(length = 4000)
     private String notes;
+    @Column(length = 4000)
+    private String displayText;
     @Enumerated(EnumType.STRING)
     @EqualsAndHashCode.Include
     @ToString.Include

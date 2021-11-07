@@ -46,6 +46,7 @@ public class PersonDTO {
     private List<RelationshipDTO> relationships = new ArrayList<>(); //possibility of multiple parents
     private Set<LinkDTO> links = new HashSet<>();
     private String notes;
+    private String displayText;
 
     public void setFirstName(String firstName) {
         if (firstName != null) {

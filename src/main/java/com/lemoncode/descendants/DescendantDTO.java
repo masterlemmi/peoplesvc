@@ -41,6 +41,7 @@ public class DescendantDTO {
     private @NonNull String gender;
     private Set<DescendantDTO> parents = new HashSet<>(); //possibility of multiple parents
     private Set<DescendantDTO> children = new HashSet<>(); //possibility of multiple parents
+    private String displayText;
 
     public void setFirstName(String firstName) {
         if (firstName != null) {
