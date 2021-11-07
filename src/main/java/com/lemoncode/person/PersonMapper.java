@@ -83,7 +83,7 @@ public abstract class PersonMapper {
                 .map(s -> Character.toString(s.charAt(0)))
                 .collect(Collectors.joining());
         simple.setInitials(initials);
-        simple.setGender(simple.getGender().equals("MALE") ? "M" : "F");
+        simple.setGender(simple.getGender().equals("MALE") || simple.getGender().equals("M") ?  "M" : "F");
         if (simple.getPhoto() != null) {
             simple.setPhotoUrl(IMAGE_URL + simple.getPhoto());
         }
@@ -103,10 +103,6 @@ public abstract class PersonMapper {
         }
         return list;
     }
-
-
-    @Mapping(target = "fullName", expression = "java(person.getFirstName() + \" \" + person.getLastName() )")
-    public abstract CacheNameDTO namesOnly(Person person);
 
     Integer computeAge(LocalDate dateOfBirth) {
         if (dateOfBirth == null) return null;
@@ -154,7 +150,7 @@ public abstract class PersonMapper {
 
         for (RelationshipDTO dto : list) {
             Set<Person> personSet = dto.getPeople().stream().map(this::toPerson).collect(toSet());
-            map.put(dto.getLabel(), new Relations(personSet));
+            map.put(dto.getLabel().toUpperCase(Locale.ROOT), new Relations(personSet));
         }
         return map;
     }
