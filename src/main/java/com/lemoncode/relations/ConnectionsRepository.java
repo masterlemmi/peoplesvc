@@ -10,7 +10,6 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -57,7 +56,7 @@ public class ConnectionsRepository {
         return this.entityManager.createQuery(delete).executeUpdate();
     }
 
-    public Connections find(Long source, Long targe){
+    public Connections find(Long source, Long targe) {
         try {
             this.entityManager.clear();
 
@@ -68,9 +67,13 @@ public class ConnectionsRepository {
 
 
             Root<Connections> root = query.from(Connections.class);
+//
+//            query.where(cb.equal(root.get(Connections_.source), source))
+//                    .where(cb.equal(root.get(Connections_.target), targe));
 
-            query.where(cb.equal(root.get(Connections_.source), source))
-                    .where(cb.equal(root.get(Connections_.target), targe));
+            query.where(cb.and
+                            (cb.equal(root.get(Connections_.source), source),
+                            cb.equal(root.get(Connections_.target), targe)));
             //perform query
             return this.entityManager.createQuery(query)
                     .getSingleResult();
