@@ -8,6 +8,22 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.*;
 
+@NamedEntityGraph(
+        name = "person-with-children-ancestries",
+        attributeNodes = {
+                @NamedAttributeNode("children"),
+                @NamedAttributeNode("ancestries"),
+                @NamedAttributeNode(value = "ancestry", subgraph = "ancestry-subgraph"),
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "ancestry-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("descendants")
+                        }
+                )
+        }
+)
 @Entity(name = "PEOPLE")
 @Table(name = "PEOPLE", uniqueConstraints = {@UniqueConstraint(columnNames = {"firstName", "lastName", "gender"})})
 @Getter

@@ -1,6 +1,7 @@
 package com.lemoncode.person;
 
 import com.lemoncode.relationship.RelationshipDTO;
+import com.lemoncode.util.CaseUtils;
 import lombok.*;
 import org.apache.commons.text.WordUtils;
 
@@ -50,19 +51,19 @@ public class PersonDTO {
 
     public void setFirstName(String firstName) {
         if (firstName != null) {
-            this.firstName = WordUtils.capitalizeFully((firstName.toLowerCase()));
+            this.firstName = CaseUtils.capitalizeName(firstName);
         }
     }
 
     public void setLastName(String lastName) {
         if (lastName != null) {
-            this.lastName = WordUtils.capitalizeFully(lastName.toLowerCase());
+            this.lastName = CaseUtils.capitalizeName(lastName);
         }
     }
 
     public void setFullName(String fullName) {
         if (fullName != null) {
-            this.fullName = WordUtils.capitalizeFully(fullName.toLowerCase());
+            this.fullName = CaseUtils.capitalizeName(fullName);
         }
     }
 

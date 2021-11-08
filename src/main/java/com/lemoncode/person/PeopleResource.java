@@ -1,6 +1,9 @@
 package com.lemoncode.person;
 
+import com.lemoncode.descendants.DescendantsAsyncService;
+import com.lemoncode.descendants.DescendantsService;
 import com.lemoncode.file.ResponseMessage;
+import com.lemoncode.relationship.RelationshipDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +31,9 @@ public class PeopleResource {
     private PeopleService peopleService;
 
     @Autowired
+    private DescendantsAsyncService descendantsService;
+
+    @Autowired
     RelationshipLabelService labelService;
 
     @Autowired
@@ -36,7 +42,9 @@ public class PeopleResource {
 
     @PostMapping("/simple")
     public SimplePersonDTO createSimplePerson(@RequestBody SimplePersonDTO p) {
-        return peopleService.createSimplePerson(p);
+        SimplePersonDTO dto = peopleService.createSimplePerson(p);
+        descendantsService.recreateDescendants();
+        return dto;
     }
 
     @PostMapping("/batch")
@@ -59,12 +67,16 @@ public class PeopleResource {
         }
 
         try {
-            return peopleService.save(people);
+            List<SimplePersonDTO> res = peopleService.save(people);
+            descendantsService.recreateDescendants();
+            return res;
         } catch (DataIntegrityViolationException e) {
             throw new BadRequestException("Entry/Entries already existing in db");
         } catch (Exception e) {
             throw new RuntimeException("Server Error: " + e.getMessage());
         }
+
+
     }
 
     @PostMapping()
@@ -79,12 +91,33 @@ public class PeopleResource {
         //    //e.g. if a ninong was defined, said niong should show inaanak for his profile.
         //    //if inaanak was defined, said inaanak will have either Ninong/Ninang defined depending on persons gender
         SimplePersonDTO main = this.mapper.toSimplePersonDTO(dto);
-       peopleService.addMainInOppositeRelationship(main, p.getRelationships());
-       peopleService.addMainAsChild(main, p.getParents());
-
+        peopleService.addMainInOppositeRelationship(main, p.getRelationships());
+        peopleService.addMainAsChild(main, p.getParents());
+        descendantsService.recreateDescendants();
 
         return dto;
     }
+
+    @PostMapping("/family")
+    public FamilyDTO createPerson(@RequestBody FamilyDTO p) {
+        FamilyDTO dto = peopleService.createFamily(p);
+
+        //  create opposite associates from the Connections defined (e.g. husband/wife -> wife/husband)
+        if (p.getParents().size() == 2) {
+            SimplePersonDTO main = p.getParents().get(0);
+            SimplePersonDTO other = p.getParents().get(1);
+            RelationshipDTO mainRelationship = new RelationshipDTO("HUSBAND", Set.of(other));
+            RelationshipDTO otherRelationship = new RelationshipDTO("HUSBAND", Set.of(main)); //label doesn't matter since it will depend on the other person
+            peopleService.addMainInOppositeRelationship(main, List.of(mainRelationship));
+            peopleService.addMainInOppositeRelationship(other, List.of(otherRelationship));
+        }
+
+
+        descendantsService.recreateDescendants();
+
+        return dto;
+    }
+
 
     @PostMapping("/{id}/image")
     public ResponseEntity<ResponseMessage> saveImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
@@ -129,7 +162,6 @@ public class PeopleResource {
     }
 
 
-
     @GetMapping("/simple/{id}")
     public SimplePersonDTO findSimpleById(@PathVariable("id") int id) {
         return peopleService.findOneSimple(id);
@@ -161,8 +193,6 @@ public class PeopleResource {
     public Set<String> getLabels() {
         return labelService.getLabelsSet();
     }
-
-
 
 
 }

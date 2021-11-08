@@ -104,6 +104,7 @@ public class ConnectionsRepository {
     }
 
 
+    @Transactional
     public int deleteAll() {
         return this.entityManager.createQuery("DELETE FROM PEOPLE_CONNECTIONS").executeUpdate();
     }

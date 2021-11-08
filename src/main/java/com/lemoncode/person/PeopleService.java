@@ -3,45 +3,33 @@ package com.lemoncode.person;
 
 import com.lemoncode.descendants.DescendantsService;
 import com.lemoncode.file.FilesStorageService;
-import com.lemoncode.relations.ConnectionsService;
+import com.lemoncode.relations.ConnectionsRepository;
 import com.lemoncode.relationship.Relations;
 import com.lemoncode.relationship.RelationshipDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class PeopleService {
-    private final static Logger LOGGER = Logger.getLogger(PeopleService.class.getName());
-    @Autowired
-    PeopleRepository repository;
-
-    @Autowired
-    PersonMapper mapper;
-
-    @Autowired
-    FilesStorageService storageService;
-
-    @Autowired
-    RelationshipLabelService labelService;
-
-    @Autowired
-    ConnectionsService connectionsService;
-
-    @Autowired
-    DescendantsService descendantsService;
-
+    private final PeopleRepository repository;
+    private final PersonMapper mapper;
+    private final FilesStorageService storageService;
+    private final RelationshipLabelService labelService;
+    private final CacheService cacheService;
+    private final ConnectionsRepository connectionsRepository;
 
     List<SimplePersonDTO> findAllSimple() {
         return repository.findAll().stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
@@ -63,7 +51,7 @@ public class PeopleService {
     }
 
     @Transactional
-   public PersonDTO findOne(Long id) {
+    public PersonDTO findOne(Long id) {
         Person person = repository.findById(id);
         PersonDTO dto = mapper.toPersonDTO(person);
 
@@ -130,8 +118,7 @@ public class PeopleService {
         Person saved = this.repository.save(person);
         p.setId(saved.getId());
         p.setFullName(p.getFirstName() + " " + p.getLastName());
-
-        connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
+        p.setId(saved.getId());
 
         return p;
     }
@@ -146,7 +133,7 @@ public class PeopleService {
         return name;
     }
 
-    InputStream getPhoto(String fileName) throws IOException {
+    InputStream getPhoto(String fileName) {
 
         try {
             return storageService.load(fileName).getInputStream();
@@ -159,6 +146,7 @@ public class PeopleService {
     }
 
 
+    @Transactional
     public PersonDTO createPerson(PersonDTO p) {
         Person person = this.mapper.toPerson(p);
         Map<String, Relations> rel = person.getRelationships();
@@ -172,20 +160,16 @@ public class PeopleService {
         }
 
         Person saved = repository.save(person);
-        connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
-        connectionsService.clearFakeCache();
-        descendantsService.clearFakeCache();
-        descendantsService.recreateDescendants();
         p.setId(saved.getId());
+        afterSavePersonTasks();
         return p;
     }
 
+    @Transactional
     public List<SimplePersonDTO> save(List<Person> people) {
 
-        List<SimplePersonDTO> createdList =  repository.save(people).stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
-
-        connectionsService.deleteAll(); //delete prebuilt connections as there may have been changes
-
+        List<SimplePersonDTO> createdList = repository.save(people).stream().map(this.mapper::toSimplePersonDTO).collect(Collectors.toList());
+        afterSavePersonTasks();
         return createdList;
 
     }
@@ -236,7 +220,7 @@ public class PeopleService {
             PersonDTO other = this.findOne(parent.getId());
             Set<SimplePersonDTO> otherChildren = other.getChildren();
 
-            boolean alreadyAdded = otherChildren.stream().anyMatch(x -> x.getId() == main.getId());
+            boolean alreadyAdded = otherChildren.stream().anyMatch(x -> x.getId().equals(main.getId()));
 
             if (alreadyAdded)
                 continue;
@@ -247,4 +231,46 @@ public class PeopleService {
     }
 
 
+    public FamilyDTO createFamily(FamilyDTO family) {
+
+        if (CollectionUtils.isEmpty(family.getParents())) {
+            throw new IllegalArgumentException("Parents must not be empty, otherwise how family?");
+        }
+
+        if (family.getParents().size() > 2) {
+            throw new IllegalArgumentException("Family Parents should only be 1 or 2");
+        }
+
+        family.getParents().stream().filter(parent -> family.getChildren().contains(parent))
+                .findAny()
+                .ifPresent(x -> {
+                    throw new IllegalArgumentException("Parent is listed in children list. ");
+                });
+
+        family.getChildren().stream().filter(child -> family.getParents().contains(child))
+                .findAny()
+                .ifPresent(x -> {
+                    throw new IllegalArgumentException("Child is listed in parent list. ");
+                });
+
+        for (SimplePersonDTO parent : family.getParents()) {
+            Person parentDB = repository.findById(parent.getId());
+            if (parentDB == null) throw new PersonNotFoundException("Parent not in db");
+
+            for (SimplePersonDTO child : family.getChildren()) {
+                Person childDB = repository.findById(child.getId());
+                parentDB.getChildren().add(childDB);
+            }
+            repository.save(parentDB);
+        }
+
+        return family;
+    }
+
+    @Transactional
+    public void afterSavePersonTasks() {
+        connectionsRepository.deleteAll(); //delete prebuilt connections as there may have been changes
+        cacheService.clearConnections();
+        cacheService.clearDescendants();
+    }
 }

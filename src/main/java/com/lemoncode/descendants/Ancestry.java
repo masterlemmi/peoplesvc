@@ -1,13 +1,20 @@
 package com.lemoncode.descendants;
 
 import com.lemoncode.person.Person;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@NamedEntityGraph(
+        name = "ancestry-entity-with-descendants",
+        attributeNodes = {
+                @NamedAttributeNode("descendants")}
+)
 @Entity(name = "ANCESTRY")
 @Table(name = "ANCESTRY")
 @Getter
@@ -16,11 +23,7 @@ import java.util.Set;
 //@ToString(onlyExplicitlyIncluded = true)
 //@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Ancestry {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @EqualsAndHashCode.Include
-//    @ToString.Include
-//    private Long id;
+
     @Id
     private Long id;
     @OneToOne

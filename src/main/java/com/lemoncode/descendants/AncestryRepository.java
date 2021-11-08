@@ -1,6 +1,7 @@
 package com.lemoncode.descendants;
 
 
+import com.lemoncode.person.Person;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityGraph;
@@ -29,7 +30,12 @@ public class AncestryRepository {
         //perform query
 //        q.orderBy(cb.desc(root.get(Ancestry_.hasUpdate)), cb.asc(root.get(Ancestry_.title)));
 
+//        EntityGraph<Ancestry> entityGraph = entityManager.createEntityGraph(Ancestry.class);
+//        entityGraph.addAttributeNodes("descendants");
+        EntityGraph<Ancestry> entityGraph = (EntityGraph<Ancestry>) entityManager.getEntityGraph("ancestry-entity-with-descendants");
+
         return this.entityManager.createQuery(q)
+                .setHint("javax.persistence.fetchgraph", entityGraph)
                 .getResultList();
     }
 

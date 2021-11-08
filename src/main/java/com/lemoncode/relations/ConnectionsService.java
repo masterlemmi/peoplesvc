@@ -4,27 +4,24 @@ import com.lemoncode.dijkrsta.ShortestPathService;
 import com.lemoncode.familytree.FamilyTreeMaker;
 import com.lemoncode.person.*;
 import com.lemoncode.relationship.RelationshipDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ConnectionsService {
-    @Autowired
-    PeopleRepository peopleRepository;
-
-    @Autowired
-    PeopleService peopleService;
-
-    @Autowired
-    ConnectionsRepository connectionsRepository;
-
-    @Autowired
-    ShortestPathService shortestPathService;
+    private final PeopleRepository peopleRepository;
+    private final PeopleService peopleService;
+    private final ConnectionsRepository connectionsRepository;
+    private final CacheService cacheService;
+    private final ShortestPathService shortestPathService;
 
     public ConnectionsDTO findConnection(Long sourceId, Long targetId) {
         Person psource = peopleRepository.findByIdNoJoins(sourceId);
@@ -129,18 +126,10 @@ public class ConnectionsService {
         connectionsRepository.save(conn);
     }
 
-    @Transactional
-    public void deleteAll() {
-        int deleted = connectionsRepository.deleteAll();
-        System.out.println("Deleted " + deleted + " rows");
-    }
-
-    Map<Long, ConnectionsDTO> fakeCache = new HashMap<>();
-
     //only Families wife/husband/parents/children/
     public ConnectionsDTO findConnection(Long source) {
 
-        ConnectionsDTO cached = fakeCache.get(source);
+        ConnectionsDTO cached = cacheService.getConnectionsCache(source);
         if (cached != null) return cached;
 
         FamilyTreeMaker familyTreeMaker = new FamilyTreeMaker(peopleService);
@@ -152,11 +141,7 @@ public class ConnectionsService {
         connectionsDTO.setRelationLabel(familyTreeMaker.getTreeLabel());
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
 
-        fakeCache.put(source, connectionsDTO);
+        cacheService.addConnectionsCache(source, connectionsDTO);
         return connectionsDTO;
-    }
-
-    public void clearFakeCache(){
-        this.fakeCache.clear();
     }
 }
