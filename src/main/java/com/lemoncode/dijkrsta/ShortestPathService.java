@@ -5,6 +5,7 @@ import com.lemoncode.person.PersonDTO;
 import com.lemoncode.person.SimplePersonDTO;
 import com.lemoncode.relations.ConnectionsService;
 import com.lemoncode.relationship.RelationshipDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +18,19 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@RequiredArgsConstructor
 public class ShortestPathService {
 
     private static final float WIFE_HUSBAND_DISTANCE = 3f;
-    private static final float OTHER_RELATION_DISTANCE=10f;
+    private static final float OTHER_RELATION_DISTANCE = 10f;
     private static final float SIBLING_DISTANCE = 1f;
     private static final float CHILD_DISTANCE = 1f;
     private static final float PARENT_DISTANCE = 1.2f;
 
+    private final PeopleService peopleService;
 
-    @Autowired
-    PeopleService peopleService;
 
-    @Autowired
-    ConnectionsService connectionsService;
-
-    public List<Long> getShortestPath(Long sourceId, Long targetId) {
+    public ShortestPath getShortestPath(Long sourceId, Long targetId) {
         Map<Long, Node> nodeMap = new HashMap<>();
         List<PersonDTO> dtos = peopleService.findAll();
         //map all people to Nodes
@@ -82,17 +80,14 @@ public class ShortestPathService {
 
         Node sourceNode = nodeMap.get(sourceId);
         graph = Dijkstra.calculateShortestPathFromSource(graph, sourceNode);
-
-        for (Node n : graph.getNodes()) {
-            String path = n.getShortestPath().stream()
-                    .map(Node::getPersonId)
-                    .map(String::valueOf)
-                    .collect(joining(","));
-            connectionsService.save(sourceNode.getPersonId(), n.getPersonId(), path);
-        }
-
-        return nodeMap.get(targetId).getShortestPath().stream()
+        List<Long> shortestPathByIds = nodeMap.get(targetId).getShortestPath().stream()
                 .map(Node::getPersonId).collect(toList());
+
+        ShortestPath shortestPath = new ShortestPath();
+        shortestPath.setPath(shortestPathByIds);
+        shortestPath.setVisitedNodes(graph.getNodes());
+
+        return shortestPath;
 
     }
 }

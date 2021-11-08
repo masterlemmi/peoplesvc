@@ -1,5 +1,7 @@
 package com.lemoncode.relations;
 
+import com.lemoncode.dijkrsta.Node;
+import com.lemoncode.dijkrsta.ShortestPath;
 import com.lemoncode.dijkrsta.ShortestPathService;
 import com.lemoncode.familytree.FamilyTreeMaker;
 import com.lemoncode.person.*;
@@ -8,11 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 @Service
 @RequiredArgsConstructor
@@ -32,16 +35,24 @@ public class ConnectionsService {
 
         Connections conn = connectionsRepository.find(sourceId, targetId);
 
-        List<Long> shortestPath;
+        List<Long> shortestPathByIds;
         if (conn == null) {
-            shortestPath = shortestPathService.getShortestPath(sourceId, targetId);
+            ShortestPath shortestPath = shortestPathService.getShortestPath(sourceId, targetId);
+            shortestPathByIds = shortestPath.getPath();
+            for (Node n : shortestPath.getVisitedNodes()) {
+                String path = n.getShortestPath().stream()
+                        .map(Node::getPersonId)
+                        .map(String::valueOf)
+                        .collect(joining(","));
+                save(sourceId, n.getPersonId(), path);
+            }
         } else {
             String dbShortestPath = conn.getShortestPath();
             if (dbShortestPath == null) return ConnectionsDTO.noLink();
-            shortestPath = Arrays.stream(dbShortestPath.split(",")).map(Long::parseLong).collect(Collectors.toList());
+            shortestPathByIds = Arrays.stream(dbShortestPath.split(",")).map(Long::parseLong).collect(Collectors.toList());
         }
 
-        return doit(shortestPath, target);
+        return doit(shortestPathByIds, target);
 
     }
 
