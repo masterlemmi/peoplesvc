@@ -24,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                    .antMatchers(HttpMethod.GET, "/user/info", "/foos/**", "/people*/**", "/descendants/**", "/relations/**")
 //                    .hasAnyRole("family_user")
                 .antMatchers(HttpMethod.POST, "/api/foos", "/people", "/descendants/**", "/relations/**")
-                .hasAnyRole("family_admin")
+                .hasAnyRole(Role.FAMILY_ADMIN)
                 .anyRequest()
                 .authenticated()
                 .and()
