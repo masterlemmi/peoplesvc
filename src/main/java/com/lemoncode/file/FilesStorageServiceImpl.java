@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.security.MessageDigest;
-
+import org.apache.commons.io.FileUtils;
 @Service
 @Slf4j
 public class FilesStorageServiceImpl implements FilesStorageService {
@@ -59,8 +59,8 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 log.info("Received temp file SHA256 : {}\n", hashHex);
 
 
-                File dir = new File(imageDir);
-                File file = new File(dir, name);
+//                File dir = new File(imageDir);
+                File file = new File(imageDir + "/" + name);
 
                 log.info("TEmp file exists before copy: {}", tmpFile.exists());
                 log.info("Copied file exists before copy: {}", file.exists());
@@ -68,7 +68,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 //                boolean movedSuccess = tmpPath.toFile().renameTo(file);
 //                log.info("Move File Success: {}", movedSuccess);
 
-                Files.copy(tmpPath, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                FileUtils.copyFile(tmpPath.toFile(), file);
                 safelyRemoveFile(tmpPath);
                 log.info("TEmp file exists after copy: {}", tmpFile.exists());
                 log.info("Copied file exists after copy: {}", file.exists());
