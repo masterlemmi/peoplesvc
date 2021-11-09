@@ -23,8 +23,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 //                    .antMatchers(HttpMethod.GET, "/user/info", "/foos/**", "/people*/**", "/descendants/**", "/relations/**")
 //                    .hasAnyRole("family_user")
-                .antMatchers(HttpMethod.POST, "/api/foos", "/people", "/descendants/**", "/relations/**")
-                .hasAnyRole("family_user")
+                .antMatchers(HttpMethod.POST, "/api/foos",
+                        "/people/*/image",
+                        "/people", "/descendants/**", "/relations/**")
+                .hasRole("FAMILY_ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()
