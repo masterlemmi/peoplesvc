@@ -1,5 +1,6 @@
 package com.lemoncode.file;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,11 @@ import java.nio.file.*;
 import java.security.MessageDigest;
 
 @Service
+@Slf4j
 public class FilesStorageServiceImpl implements FilesStorageService {
 
     @Value("${imageDir}")
     private String imageDir;
-
-    private static final Logger LOG = LoggerFactory.getLogger(FilesStorageServiceImpl.class);
 
     @Autowired
     DocumentSanitizer sanitizer;
@@ -32,7 +32,9 @@ public class FilesStorageServiceImpl implements FilesStorageService {
         Path tmpPath = null;
         try {
             File tmpFile = File.createTempFile("uploaded-", null);
+
             tmpPath = tmpFile.toPath();
+            log.info("Temp file: {}", tmpPath.toString());
             long copiedBytesCount = Files.copy(uploaded.getInputStream(), tmpPath, StandardCopyOption.REPLACE_EXISTING);
             if (copiedBytesCount != uploaded.getSize()) {
                 throw new IOException(String.format("Error during stream copy to temporary disk (copied: %s / expected: %s !", copiedBytesCount, uploaded.getSize()));
@@ -41,7 +43,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
             boolean isSafe = sanitizer.madeSafe(tmpFile);
 
             if (!isSafe) {
-                LOG.warn("Detection of a unsafe file upload or cannot sanitize uploaded document !");
+                log.warn("Detection of a unsafe file upload or cannot sanitize uploaded document !");
                 safelyRemoveFile(tmpPath);
                 throw new RuntimeException("File not safe");
             } else {
@@ -50,7 +52,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 MessageDigest digester = MessageDigest.getInstance("sha-256");
                 byte[] hash = digester.digest(content);
                 String hashHex = DatatypeConverter.printHexBinary(hash);
-                LOG.info("Received temp file SHA256 : {}\n", hashHex);
+                log.info("Received temp file SHA256 : {}\n", hashHex);
 
 
                 File dir = new File(imageDir);
@@ -73,7 +75,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
         try {
             Path root = Paths.get(imageDir );
             Path file = root.resolve(filename);
-            LOG.info("FileName" + file.toFile());
+            log.info("FileName" + file.toFile());
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
@@ -102,7 +104,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 }
             }
         } catch (Exception e) {
-            LOG.warn("Cannot safely remove file !", e);
+            log.warn("Cannot safely remove file !", e);
         }
     }
 
