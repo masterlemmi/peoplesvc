@@ -59,6 +59,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
 
