@@ -1,25 +1,29 @@
 package com.lemoncode.person;
 
 import com.lemoncode.descendants.DescendantsAsyncService;
-import com.lemoncode.descendants.DescendantsService;
 import com.lemoncode.file.ResponseMessage;
 import com.lemoncode.relationship.RelationshipDTO;
+import com.lemoncode.spring.Role;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toSet;
 
 
 @RestController
@@ -135,6 +139,7 @@ public class PeopleResource {
         }
     }
 
+    @Secured({Role.FAMILY_USER, Role.TAEZA_USER })
     @GetMapping
     public List<SimplePersonDTO> find(@RequestParam(value = "q", required = false) String query, @RequestParam(value = "exclude", required = false) String excludeIds) {
 
@@ -167,6 +172,7 @@ public class PeopleResource {
         return peopleService.findOneSimple(id);
     }
 
+    @Secured(Role.FAMILY_USER)
     @GetMapping("/{id}")
     public PersonDTO findPersonById(@PathVariable("id") Long id) {
         return peopleService.findOne(id);
