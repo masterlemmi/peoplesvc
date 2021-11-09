@@ -65,11 +65,11 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 log.info("TEmp file exists before copy: {}", tmpFile.exists());
                 log.info("Copied file exists before copy: {}", file.exists());
 
-                boolean movedSuccess = tmpPath.toFile().renameTo(file);
-                log.info("Move File Success: {}", movedSuccess);
+//                boolean movedSuccess = tmpPath.toFile().renameTo(file);
+//                log.info("Move File Success: {}", movedSuccess);
 
-//                Files.copy(tmpPath, file.toPath());
-//                safelyRemoveFile(tmpPath);
+                Files.copy(tmpPath, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                safelyRemoveFile(tmpPath);
                 log.info("TEmp file exists after copy: {}", tmpFile.exists());
                 log.info("Copied file exists after copy: {}", file.exists());
 
@@ -78,6 +78,8 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 
         } catch (Exception e) {
             e.printStackTrace();
+            log.info("TEmp file exists after copy: {}", tmpPath.toFile().exists());
+
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
 
@@ -88,7 +90,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
         try {
             Path root = Paths.get(imageDir );
             Path file = root.resolve(filename);
-            log.info("FileName" + file.toFile());
+            log.info("FileName: {}" , file.toFile());
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
