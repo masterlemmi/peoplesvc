@@ -35,10 +35,14 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 
             tmpPath = tmpFile.toPath();
             log.info("Temp file: {}", tmpPath.toString());
+            log.info("TEmp file exists: {}", tmpFile.exists());
+
             long copiedBytesCount = Files.copy(uploaded.getInputStream(), tmpPath, StandardCopyOption.REPLACE_EXISTING);
             if (copiedBytesCount != uploaded.getSize()) {
                 throw new IOException(String.format("Error during stream copy to temporary disk (copied: %s / expected: %s !", copiedBytesCount, uploaded.getSize()));
             }
+
+            log.info("TEmp file exists after tempfile copy: {} size: {}", tmpFile.exists(), copiedBytesCount);
 
             boolean isSafe = sanitizer.madeSafe(tmpFile);
 
@@ -58,8 +62,14 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 File dir = new File(imageDir);
                 File file = new File(dir, name);
 
+                log.info("TEmp file exists before copy: {}", tmpFile.exists());
+                log.info("Copied file exists before copy: {}", file.exists());
+
                 Files.copy(tmpPath, file.toPath());
                 safelyRemoveFile(tmpPath);
+                log.info("TEmp file exists after copy: {}", tmpFile.exists());
+                log.info("Copied file exists after copy: {}", file.exists());
+
 
             }
 
