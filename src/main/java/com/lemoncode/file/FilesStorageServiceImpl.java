@@ -55,7 +55,10 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 
                 File dir = new File(imageDir);
                 File file = new File(dir, name);
-                Files.copy(uploaded.getInputStream(), file.toPath());
+
+                Files.copy(tmpPath, file.toPath());
+                safelyRemoveFile(tmpPath);
+
             }
 
         } catch (Exception e) {
