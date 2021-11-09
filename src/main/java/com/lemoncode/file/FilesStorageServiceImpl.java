@@ -28,7 +28,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
     DocumentSanitizer sanitizer;
 
     @Override
-    public void save(String name, MultipartFile uploaded) {
+        public void save(String name, MultipartFile uploaded) {
         Path tmpPath = null;
         try {
             File tmpFile = File.createTempFile("uploaded-", null);
@@ -65,8 +65,11 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 log.info("TEmp file exists before copy: {}", tmpFile.exists());
                 log.info("Copied file exists before copy: {}", file.exists());
 
-                Files.copy(tmpPath, file.toPath());
-                safelyRemoveFile(tmpPath);
+                boolean movedSuccess = tmpPath.toFile().renameTo(file);
+                log.info("Move File Success: {}", movedSuccess);
+
+//                Files.copy(tmpPath, file.toPath());
+//                safelyRemoveFile(tmpPath);
                 log.info("TEmp file exists after copy: {}", tmpFile.exists());
                 log.info("Copied file exists after copy: {}", file.exists());
 
