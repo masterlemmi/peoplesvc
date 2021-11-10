@@ -102,7 +102,9 @@ public class ConnectionsService {
         ConnectionsDTO connectionsDTO = new ConnectionsDTO();
         connectionsDTO.setNodes(nodes);
         connectionsDTO.setLinks(links);
-        connectionsDTO.setRelationLabel(Label.from(links).byGender(target.getGender()));
+        Label label = Label.from(links);
+        String strLabel = label == Label.DIRECT_ANCESTOR ? Label.ancestorLabel(links) : label.byGender(target.getGender());
+        connectionsDTO.setRelationLabel(strLabel);
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
 
         return connectionsDTO;

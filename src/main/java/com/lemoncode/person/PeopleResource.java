@@ -139,7 +139,7 @@ public class PeopleResource {
         }
     }
 
-    @Secured({Role.FAMILY_USER, Role.TAEZA_USER })
+    @Secured({Role.FAMILY_USER, Role.FAMILY_GUEST, Role.TAEZA_USER })
     @GetMapping
     public List<SimplePersonDTO> find(@RequestParam(value = "q", required = false) String query, @RequestParam(value = "exclude", required = false) String excludeIds) {
 
