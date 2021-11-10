@@ -25,6 +25,7 @@ public class ConnectionsService {
     private final ConnectionsRepository connectionsRepository;
     private final CacheService cacheService;
     private final ShortestPathService shortestPathService;
+    private final LabelService labelService;
 
     public ConnectionsDTO findConnection(Long sourceId, Long targetId) {
         Person psource = peopleRepository.findByIdNoJoins(sourceId);
@@ -102,8 +103,7 @@ public class ConnectionsService {
         ConnectionsDTO connectionsDTO = new ConnectionsDTO();
         connectionsDTO.setNodes(nodes);
         connectionsDTO.setLinks(links);
-        Label label = Label.from(links);
-        String strLabel = label == Label.DIRECT_ANCESTOR ? Label.ancestorLabel(links) : label.byGender(target.getGender());
+        String strLabel = labelService.getLabel(links, target);
         connectionsDTO.setRelationLabel(strLabel);
         connectionsDTO.setStatus("success"); //TODO: set to inprogress for thread based processing
 

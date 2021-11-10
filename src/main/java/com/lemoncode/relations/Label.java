@@ -19,10 +19,15 @@ public enum Label {
     TITO_TITA_4("tito", "tita", "tito/tita", "/grandparent's second cousin"),
     TITO_TITA_5("tito", "tita", "tito/tita", "/great great grandparent's second cousin"),
     LOLO_LOLA("lolo", "lola", "lolo/lola", ""),
+    GRAND_CHILD("grandson", "grand daughter", "grandchild", "/apo"),
     LOLO_LOLA_1("lolo", "lola", "lolo/lola", " sa tuhod/great grandparent"),
+    GRAND_CHILD_1("great grandson", "great grand daughter", "greate grandchild", "/apo sa tuhod"),
     LOLO_LOLA_2("lolo", "lola", "lolo/lola", " sa talampakan/great great grandparent"),
+    GRAND_CHILD_2("greate great grandson", "greate great grand daughter", "greate greate grandchild", "/apo sa talampakan"),
     PARENT("father", "mother", "parent", ""),
+    CHILD("son", "daughter", "child", ""),
     DIRECT_ANCESTOR("", "", "", ""),
+    DIRECT_DESCENDANT("", "", "", ""),
     UNDETERMINED("", "", "", "");
 
 
@@ -61,7 +66,14 @@ public enum Label {
     public static Label from(List<ConnectionsDTO.Edge> links) {
         List<String> list = links.stream().map(ConnectionsDTO.Edge::getLabel).collect(toList());
 
-        if (list.stream().allMatch(CHILD_OF::equals)) {
+        if (list.stream().allMatch(PARENT_OF::equals)) {
+            int count = list.size();
+            if (count == 1) return Label.CHILD;
+            else if (count == 2) return Label.GRAND_CHILD;
+            else if (count == 3) return Label.GRAND_CHILD_1;
+            else if (count == 4) return Label.GRAND_CHILD_2;
+            else return Label.DIRECT_DESCENDANT;
+        } else if (list.stream().allMatch(CHILD_OF::equals)) {
             int count = list.size();
             if (count == 1) return Label.PARENT;
             else if (count == 2) return Label.LOLO_LOLA;
@@ -82,11 +94,11 @@ public enum Label {
             return Label.TITO_TITA_1;
         } else if (list.equals(TITO_TITA_2ND_LEVEL)) {
             return Label.TITO_TITA_2;
-        } else if (list.equals(TITO_TITA_4TH_LEVEL)) {
-            return Label.TITO_TITA_3;
-        } else if (list.equals(TITO_TITA_5TH_LEVEL)) {
-            return Label.TITO_TITA_4;
         } else if (list.equals(TITO_TITA_3RD_LEVEL)) {
+            return Label.TITO_TITA_3;
+        } else if (list.equals(TITO_TITA_4TH_LEVEL)) {
+            return Label.TITO_TITA_4;
+        } else if (list.equals(TITO_TITA_5TH_LEVEL)) {
             return Label.TITO_TITA_5;
         } else {
             return UNDETERMINED;
@@ -98,13 +110,15 @@ public enum Label {
         int count = links.size();
         if (count <= 4) throw new IllegalStateException("wrong usage. call Label.from instead");
         int greatCount = count - 2;//how many greats to use
-        StringBuilder great = new StringBuilder();
-        for (int i = 0; i < greatCount; i++) {
-            great.append("great ");
-        }
-        great.append("grandparent");
+        return "great ".repeat(greatCount) + "grandparent";
+    }
 
-        return great.toString();
+    //links are all - parent of- whose count is greater than 4
+    public static String descendantLabel(List<ConnectionsDTO.Edge> links, GenderEnum targetGender) {
+        int count = links.size();
+        if (count <= 4) throw new IllegalStateException("wrong usage. call Label.from instead");
+        int greatCount = count - 2;//how many greats to use
+        return "great ".repeat(greatCount) + " " + GRAND_CHILD.byGender(targetGender);
     }
 
     public String byGender(GenderEnum g) {
