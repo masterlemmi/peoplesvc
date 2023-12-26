@@ -38,7 +38,9 @@ docker run -p8083:8083 peoplesvc
 2. Ensure local branch has latest `master` changes
 3. Ensure branch can run locally with `h2` active profile
 4. Make Changes on  your  branch and Test
-4. When ready copy master versions for the ff files using `git checkout master/filepath`:
+5. When ready copy master versions for the ff files using `git checkout master/filepath`:
    - SecurityConfig.java
    - PeopleResource.java
- 
+6. Create PR and review changes
+7. Test Deployment Using your branch
+8. When everything works, merge your branch
