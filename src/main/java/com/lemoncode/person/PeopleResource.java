@@ -172,7 +172,7 @@ public class PeopleResource {
         return peopleService.findOneSimple(id);
     }
 
-    @Secured(Role.FAMILY_USER)
+    //@Secured(Role.FAMILY_USER)
     @GetMapping("/{id}")
     public PersonDTO findPersonById(@PathVariable("id") Long id) {
         return peopleService.findOne(id);
