@@ -16,23 +16,23 @@ import org.springframework.security.oauth2.jwt.Jwt;
         jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {// @formatter:off
-        http.cors()
-                .and()
-                .authorizeRequests()
-//                    .antMatchers(HttpMethod.GET, "/user/info", "/foos/**", "/people*/**", "/descendants/**", "/relations/**")
-//                    .hasAnyRole("family_user")
-                .antMatchers(HttpMethod.POST, "/api/foos",
-                        "/people/*/image",
-                        "/people", "/descendants/**", "/relations/**")
-                .hasRole("FAMILY_ADMIN")
-                .anyRequest()
-                .authenticated()
-                .and()
-                .oauth2ResourceServer()
-                .jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
-    }//@formatter:on
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {// @formatter:off
+//        http.cors()
+//                .and()
+//                .authorizeRequests()
+////                    .antMatchers(HttpMethod.GET, "/user/info", "/foos/**", "/people*/**", "/descendants/**", "/relations/**")
+////                    .hasAnyRole("family_user")
+//                .antMatchers(HttpMethod.POST, "/api/foos",
+//                        "/people/*/image",
+//                        "/people", "/descendants/**", "/relations/**")
+//                .hasRole("FAMILY_ADMIN")
+//                .anyRequest()
+//                .authenticated()
+//                .and()
+//                .oauth2ResourceServer()
+//                .jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
+//    }//@formatter:on
 
 
     private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
@@ -40,10 +40,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {// @formatter:off
-//        http.cors().and().csrf().disable().authorizeRequests().anyRequest().permitAll();
-//        http.headers().frameOptions().disable();
-//    }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {// @formatter:off
+        http.cors().and().csrf().disable().authorizeRequests().anyRequest().permitAll();
+        http.headers().frameOptions().disable();
+    }
 
 }
