@@ -2,8 +2,6 @@
 - rest resource protected by keycloak oauth implementation
 
 
-#### TODO
-1. Flag for Secured Annotation
 
 ###  Local Setup
 - Intellij (add annotation processors:)  
@@ -33,7 +31,12 @@ docker run -p8081:8081 peoplesvc
 
 
 ### TODO
-1. load resource list only/ health later
-2. TeroyReviewer
-3. Chichi Tutorial
-4. Tree - How one person is connected/related to other
+1. Flag for Secured Annotation
+
+### Development Process
+1. Branch out from branch `local`
+2. Ensure local branch has latest `master` changes
+3. Make Changes to your branch and Test
+4. When ready copy master versions for the ff files:
+   - SecurityConfig.java
+   - PeopleResource.java
