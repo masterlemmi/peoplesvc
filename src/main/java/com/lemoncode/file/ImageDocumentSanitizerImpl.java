@@ -146,7 +146,8 @@ public class ImageDocumentSanitizerImpl implements DocumentSanitizer {
                             }
 
                         }
-                        imageParser.writeImage(sanitizedImage, fos, new HashMap<>());
+                        //disabled due to vulnerabilities
+                       // imageParser.writeImage(sanitizedImage, fos, new HashMap<>());
                     }
 
                 }

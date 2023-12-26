@@ -18,20 +18,16 @@ spring:
           issuer-uri: http://localhost:8080/auth/realms/SpringBootKeycloak
           jwk-set-uri: http://localhost:8080/auth/realms/SpringBootKeycloak/protocol/openid-connect/certs
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/orclpdb1
-    username: lem_stage
-    password: lem_stage
-    hikari:
-      minimumIdle: 5
-      maximumPoolSize: 20
-      idleTimeout: 30000
-      maxLifetime: 2000000
-      connectionTimeout: 30000
-      poolName: HikariPoolBooks
-
+    username: lem
+    password: lem
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:file:~/h2taeza1
+    #url: jdbc:h2:mem:testdb
+  h2:
+    console.enabled: true
   jpa:
     database: oracle
-    database-platform: org.hibernate.dialect.Oracle12cDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     generate-ddl: true
     hibernate:
       use-new-id-generator-mappings: false
