@@ -16,7 +16,7 @@
 
 ### Docker build
 docker build -t peoplesvc .  
-docker run -p8081:8081 peoplesvc
+docker run -p8083:8083 peoplesvc
 
 ### End Points
 - localhost:8081
@@ -36,7 +36,11 @@ docker run -p8081:8081 peoplesvc
 ### Development Process
 1. Branch out from branch `local`
 2. Ensure local branch has latest `master` changes
-3. Make Changes to your branch and Test
-4. When ready copy master versions for the ff files:
+3. Ensure branch can run locally with `h2` active profile
+4. Make Changes on  your  branch and Test
+5. When ready copy master versions for the ff files using `git checkout master/filepath`:
    - SecurityConfig.java
    - PeopleResource.java
+6. Create PR and review changes
+7. Test Deployment Using your branch
+8. When everything works, merge your branch
