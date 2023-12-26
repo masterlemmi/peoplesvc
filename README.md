@@ -1,11 +1,15 @@
 ##  PERSON FINDER SERVICE
 - rest resource protected by keycloak oauth implementation
 
+
+#### TODO
+1. Flag for Secured Annotation
+
 ###  Local Setup
 - Intellij (add annotation processors:)  
   - lombok.launch.AnnotationProcessorHider$AnnotationProcessor
   - org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor
-- 18C Oracle XE
+- H2DB (h2) or 18C Oracle XE(local)
   - run sql scripts in test resources
 - Disable Security by commenting SecurityConfig(todo: replace with property setting hcange)F
 - Disable CorsMapping in WebConfig (todo: replace with property setting hcange)F
