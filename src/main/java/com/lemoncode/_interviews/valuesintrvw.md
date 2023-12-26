@@ -42,6 +42,7 @@ Common Service API.
 Oracle - 
   = FA task. finance terminology, new. old technology plsql/ide. thousands of lines. no more mentors. learn on free time.
   = references - identify what main business object affected (rest, separate,stream, cache, - learned need input from everybody for best solun)
+  = choose between database streaming options
 mbtc. 
   = copy r2 codes with r1. pushback, uesless code.  ownership, long term more important than short term gains
   = pushback mananger, 

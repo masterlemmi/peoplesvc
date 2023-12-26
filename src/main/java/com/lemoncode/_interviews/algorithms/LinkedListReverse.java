@@ -35,7 +35,7 @@ class LinkedListReverse {
 
     static void push(int data) {
         Node newNode = new Node(data);
-        newNode.next = HEAD_NODE;   //the new node will become the head whose next is the previous HEAD node
+        newNode.next = HEAD_NODE;   //the newNode will become the head whose next is the previous HEAD node
         HEAD_NODE = newNode;
     }
 

@@ -1,4 +1,4 @@
-package com.lemoncode._interviews.algorithms.graph;
+package com.lemoncode._interviews.algorithms.graph.djikstra;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Node {
+public class  Node {
     private final String name;
     Integer distanceToSource = Integer.MAX_VALUE;
     Map<Node, Integer> adjacentNodeMap = new HashMap<>();

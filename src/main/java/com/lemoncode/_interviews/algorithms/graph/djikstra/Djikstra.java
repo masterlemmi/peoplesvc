@@ -1,4 +1,4 @@
-package com.lemoncode._interviews.algorithms.graph;
+package com.lemoncode._interviews.algorithms.graph.djikstra;
 
 import org.junit.jupiter.api.Assertions;
 
@@ -42,11 +42,12 @@ public class Djikstra {
         unvisited.add(source);
 
         while (!unvisited.isEmpty()) {
-
+            //get closest node to source
             Node closestNode = unvisited.stream().min(Comparator.comparing(Node::getDistanceToSource)).orElse(null);
             unvisited.remove(closestNode);
             Map<Node, Integer> adjacentNodeMap = closestNode.getAdjacentNodeMap();
 
+            //update  shortest path and distance to source of neighbor nodes
             for (Node node : adjacentNodeMap.keySet()) {
                 if (visited.contains(node))
                     continue;
@@ -56,6 +57,7 @@ public class Djikstra {
                 int newDistToSrc = currentDistToSrc + lweight;
 
                 if (newDistToSrc < node.getDistanceToSource()) {
+                    //default is max int.
                     node.setDistanceToSource(newDistToSrc);
                     List<Node> shortestPath = closestNode.getShortestPath();
                     List<Node> newShortestPath = new LinkedList<>(shortestPath);

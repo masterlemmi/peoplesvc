@@ -9,8 +9,10 @@ question: am i cutting/elemintatin my input in half? -- then we are doing logN t
 
 
 2. GRAPH TRAVERSAL (dfs/bfs/dykstra)
+DFS - recursive going to children
+BFS - add results to queue.  (poll - take head, add (to end))
 
-3. Binary Search Algorithm
+3. Binary Search Algorithm  ... find matched element of pivoted array
 
 4. Sliding Window Technique/Manipulating Pointers (longest palindrome)
 
@@ -18,7 +20,10 @@ question: am i cutting/elemintatin my input in half? -- then we are doing logN t
 
 6. reverse linked list
 
-7. Tries / Suffix Tree --- TODO
+7. Tries / Complex Trie/ Suffix Tree --- TODO
+   Standard Trie - space O(length of text)
+   Compress Trie - space O(count of words)
+   
 
 8. Heaps (min/max) --> represent into array
 
