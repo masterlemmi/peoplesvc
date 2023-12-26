@@ -20,6 +20,10 @@ public enum Label {
     TITO_TITA_5("tito", "tita", "tito/tita", "/great great grandparent's second cousin"),
     LOLO_LOLA("lolo", "lola", "lolo/lola", ""),
     GRAND_CHILD("grandson", "grand daughter", "grandchild", "/apo"),
+    PAMANGKIN("nephew", "niece", "nephew/niece", "/pamangkin"),
+    PAMANGKIN_2("nephew", "niece", "nephew/niece", "/cousin's child"),
+    PAMANGKIN_3("nephew", "niece", "nephew/niece", "/second cousin's child"),
+    PAMANGKIN_4("nephew", "niece", "nephew/niece", "/third cousin's child"),
     LOLO_LOLA_1("lolo", "lola", "lolo/lola", " sa tuhod/great grandparent"),
     GRAND_CHILD_1("great grandson", "great grand daughter", "greate grandchild", "/apo sa tuhod"),
     LOLO_LOLA_2("lolo", "lola", "lolo/lola", " sa talampakan/great great grandparent"),
@@ -52,7 +56,9 @@ public enum Label {
 
     //TODO oopposite of the follwing (e.g. NEPHEW/GRANDDAUGHETER GRANDSON);
     private static final List<String> COUSINS = Arrays.asList(CHILD_OF, SIBLING_OF, PARENT_OF);
-    private static final List<String> SECOND_COUSINS = Arrays.asList(CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF);
+    private static final List<String> NEPHEW_NIECE_1 = Arrays.asList( SIBLING_OF, PARENT_OF);
+    private static final List<String> NEPHEW_NIECE_2 = Arrays.asList( CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF);
+     private static final List<String> SECOND_COUSINS = Arrays.asList(CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF);
     private static final List<String> THIRD_COUSINS = Arrays.asList(CHILD_OF, CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF, PARENT_OF);
     private static final List<String> FOURTH_COUSINS = Arrays.asList(CHILD_OF, CHILD_OF, CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF, PARENT_OF, PARENT_OF);
     private static final List<String> FIFTH_COUSINS = Arrays.asList(CHILD_OF, CHILD_OF, CHILD_OF, CHILD_OF, CHILD_OF, SIBLING_OF, PARENT_OF, PARENT_OF, PARENT_OF, PARENT_OF, PARENT_OF);
@@ -100,6 +106,10 @@ public enum Label {
             return Label.TITO_TITA_4;
         } else if (list.equals(TITO_TITA_5TH_LEVEL)) {
             return Label.TITO_TITA_5;
+        } else if (list.equals(NEPHEW_NIECE_1)){
+            return Label.PAMANGKIN;
+        } else if (list.equals(NEPHEW_NIECE_2)){
+            return Label.PAMANGKIN_2;
         } else {
             return UNDETERMINED;
         }
